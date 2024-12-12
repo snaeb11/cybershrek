@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cambay:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <title>Document</title>
+
+    <style>
+        body{
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            font-family: 'Cambay', sans-serif;
+        }
+
+        .div{
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #white{
+           background-color: #ffffff; 
+           display: flex;
+        }
+
+        #black{
+            display: flex;
+            background-image: url(resources/pexels-tiger-lily-4483610.jpg);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #1b1b1b;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #black::before{
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        #black > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        #welcome{
+            align-items: baseline;
+        }
+        
+        .textContainer{
+            display: flex;
+        }
+
+        #jais-logo{
+            height: auto;
+            max-width: 125%;
+        }
+
+        .welcomeContainer{
+            display: flex;
+            justify-content: center;
+        }
+        
+        #welcome{
+            font-size: 70px;
+            font-weight: 1000;
+            color: white;
+            margin: auto;
+        }
+
+        .formContainer{
+            display: flex;
+            justify-content: center;
+            width: 75%;
+        }
+
+        .form{
+            display: flex;
+            margin: 0;
+            flex-direction: column;
+            padding: 10%;
+            width: 50%;
+        }
+
+        .input{
+            border: none;
+            border-bottom: 1px solid white;
+            outline: none;
+            background-color: transparent;
+            color: white;
+            padding: 5px;
+            padding-bottom: 0;
+            font-size: 15px;
+        }
+
+        input::placeholder{
+            color: white;
+            opacity: 1;
+        }
+
+        input:focus{
+            border-bottom: 1px solid white;
+        }
+
+        .inputButton{
+            background: none;
+            border: none;
+            color: white;
+            font: inherit;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+            text-align: right;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .inputButton:focus{
+            border: none;
+        }
+
+        a{
+            color: white;
+            text-decoration: none;
+            margin: 0;
+            padding: 0;
+            width: 50%;
+        }
+
+        a:visited{
+            color: white;
+        }
+
+        a:hover{
+            color: white;
+            text-decoration: underline;
+        }
+
+        a:active{
+            color: white;
+        }
+
+        .inputButton{
+            font-family: 'Cambay', sans-serif;
+            background: linear-gradient(to right, rgb(8, 41, 150),rgb(255, 208, 0),rgb(241, 241, 241));
+            background-size: 200% 200%;
+            animation: rainbow 2s ease-in-out infinite;
+            background-clip: text;
+            -webkit-background-clip:text;
+            color: #ffffff;
+            font-size:25px;
+            transition: color .2s ease-in-out;
+            font-weight:700;
+        }
+
+        .inputButton:hover{
+            color:rgba(0,0,0,0);
+            border: none;
+        }
+
+        @keyframes rainbow { 
+            0%{background-position:left}
+            50%{background-position:right}
+            100%{background-position:left}
+        }
+    </style>
+</head>
+<body>
+    <div class="div" id="white">
+        <div class="textContainer">
+            <img src="resources/Vector.svg" alt="jais. logo" id="jais-logo">
+        </div>
+    </div>
+    <div class="div" id="black">
+
+            <div class="welcomeContainer">
+                <p class="text" id="welcome">welcome</p>
+            </div>
+    
+            <div class="formContainer">
+                <form action="" class="form" id="login">
+                    <input type="email" class="input" id="emailInput" placeholder="email" autocomplete="off">
+                    <br>
+                    <input type="password" class="input" id="passwordInput" placeholder="password" autocomplete="off">
+                    <br>
+                    <a href="createAcc.html" id="skill-issu">Don't have an account?</a>
+                    <input type="submit" class="inputButton" id="submit" value="login">
+                </form>
+            </div>
+
+    </div>
+
+    <script>
+        //import Swal from 'sweetalert2/dist/sweetalert2.js';
+
+
+        document.addEventListener("DOMContentLoaded", function() {
+        const loginForm = document.getElementById("login");
+        const emailInput = document.getElementById("emailInput");
+        const passwordInput = document.getElementById("passwordInput");
+
+        const adminCredentials = {
+            email: "admin@gmail.com",
+            password: "admin123"
+        };
+
+        const clerkCredentials = {
+            email: "clerk@gmail.com",
+            password: "clerk123"
+        };
+
+        loginForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const enteredEmail = emailInput.value.trim();
+            const enteredPassword = passwordInput.value.trim();
+
+            if (enteredEmail === adminCredentials.email && enteredPassword === adminCredentials.password) {
+                alert("Login successful!: ADMIN");
+                loginRedirect("inventory.html", "SUPAAA ADMIN");
+            } else if (enteredEmail === clerkCredentials.email && enteredPassword === clerkCredentials.password) {
+                alert("Login successful!: CLERK");
+                loginRedirect("inventory.html", "Clerk");
+            } else {
+                alert("Skill Issue.\n admin: admin@gmail.com, password: admin123 \n clerk: clerk@gmail.com, password: clerk123");
+                passwordInput.value = "";
+            }
+        });
+        });
+
+        function loginRedirect(url, adminType) {
+            window.location.href = `${url}?adminType=${adminType}`;
+        }
+    </script>
+</body>
+</html>

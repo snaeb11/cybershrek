@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cambay:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="lib/datatables/dataTables.css">
+    <style>
+        body{
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            flex-direction: column;
+            font-family: 'Cambay', sans-serif;
+        }
+
+        .navbar{
+            background-color: #1b1b1b;
+            display: flex;
+            justify-content: right;
+            padding: 1%;
+            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        #myTable{
+            padding: 2%;
+        }
+
+        .titleInventory{
+            margin-left:  1%;
+            margin-top: 1%;
+        }
+
+        #inventoryTitle{
+            font-size: 70px;
+            font-weight: 1000;
+            color: #1b1b1b;
+            margin: auto;
+        }
+
+        .tableContent {
+            background-color: #f9f9f9;
+            padding: 45px;
+            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 85%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #1b1b1b;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #e6e6e6;
+        }
+
+        .wrapper{
+            display: flex;
+            justify-content: center;
+        }
+
+        .adminType{
+            color: white;
+            width: 100%;
+            margin-left: 2%;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <p class="adminType">Test</p><img src="resources/small-Vector.svg" alt="jais-logo">
+    </nav>
+
+    <div class="titleInventory">
+        <p class="text" id="inventoryTitle">Inventory</p>
+    </div>
+
+    <div class="wrapper">
+        <div class="tableContent">
+            <table id="myTable" class="display">
+                <thead>
+                    <tr>
+                        <th>Number</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Cost</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0001</td>
+                        <td>Computer</td>
+                        <td>Computer packager maoghus imposter</td>
+                        <td>1,000</td>
+                        <td>Functional</td>
+                    </tr>
+                    <tr>
+                        <td>0002</td>
+                        <td>Projector</td>
+                        <td>shit that show shit on walls</td>
+                        <td>500</td>
+                        <td>Functional</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="lib/jQuery/jquery-3.7.1.min.js"></script>
+    <script src="lib/datatables/dataTables.js"></script>
+
+    <script>
+        $(document).ready( function () {
+            $('#myTable').DataTable();
+        } );
+
+        document.addEventListener("DOMContentLoaded", function() {
+        const adminType = new URLSearchParams(window.location.search).get('adminType');
+        if (adminType) {
+            const adminTypeElement = document.querySelector('.adminType');
+            if (adminTypeElement) {
+            adminTypeElement.textContent = adminType;
+            }
+        }
+        });
+    </script>
+</body>
+</html>
