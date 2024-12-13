@@ -241,6 +241,30 @@
         function loginRedirect(url, adminType) {
             window.location.href = `${url}?adminType=${adminType}`;
         }
+
+        function loadConfigFile() {
+            // Retrieve config file to load database, tables, views, stored procedures/functions...
+            fetch("config/config.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    console.log("Config Loaded:", data);
+                })
+                .catch(error => {
+                    console.error("Error loading config file:", error);
+                });
+        }
+
+        loadConfigFile();
     </script>
 </body>
 </html>
