@@ -16,10 +16,27 @@
             height: 100vh;
             flex-direction: column;
             font-family: 'Cambay', sans-serif;
+            position: relative;
+            z-index: 1;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url(resources/breadPat.jpg);
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            background-position: center;
+            opacity: 0.45;
+            z-index: -1;
         }
 
         .navbar{
-            background-color: #1b1b1b;
+            background-color: #9F6D45;
             display: flex;
             justify-content: right;
             padding: 1%;
@@ -31,21 +48,21 @@
         }
 
         .titleInventory{
-            margin-left:  1%;
-            margin-top: 1%;
+            margin: 1%;
+            padding: 0%;
         }
 
         #inventoryTitle{
             font-size: 70px;
             font-weight: 1000;
-            color: #1b1b1b;
+            color: #9F6D45;
             margin: auto;
         }
 
         .tableContent {
             background-color: #f9f9f9;
             padding: 45px;
-            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 4px 14px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             width: 85%;
         }
@@ -62,7 +79,7 @@
         }
 
         th {
-            background-color: #1b1b1b;
+            background-color: #9F6D45;
             color: white;
         }
 
@@ -84,11 +101,70 @@
             width: 100%;
             margin-left: 2%;
         }
+
+        .cssbuttons-io-button {
+            background: #9F6D45;
+            color: white;
+            font-family: inherit;
+            padding: 0.35em;
+            padding-left: 1.2em;
+            font-size: 17px;
+            font-weight: 500;
+            border-radius: 0.9em;
+            border: none;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            box-shadow: inset 0 0 1.6em -0.6em #9F6D45;
+            overflow: hidden;
+            position: relative;
+            height: 2.8em;
+            padding-right: 3.3em;
+            cursor: pointer;
+        }
+
+            .cssbuttons-io-button .icon {
+            background: white;
+            margin-left: 1em;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 2.2em;
+            width: 2.2em;
+            border-radius: 0.7em;
+            box-shadow: 0.1em 0.1em 0.6em 0.2em #9F6D45;
+            right: 0.3em;
+            transition: all 0.3s;
+        }
+
+            .cssbuttons-io-button:hover .icon {
+            width: calc(100% - 0.6em);
+        }
+
+            .cssbuttons-io-button .icon svg {
+            width: 1.1em;
+            transition: transform 0.3s;
+            color: #9F6D45;
+        }
+
+            .cssbuttons-io-button:hover .icon svg {
+            transform: translateX(0.1em);
+        }
+
+            .cssbuttons-io-button:active .icon {
+            transform: scale(0.95);
+        }
+
     </style>
 </head>
 <body>
     <nav class="navbar" id="navbar">
-        <p class="adminType">Test</p><img src="resources/small-Vector.svg" alt="jais-logo">
+        <img src="resources/burger.svg" alt="">
+        <p class="adminType">Test</p>
+        <a href="index.html">
+            <img src="resources/small-Vector.svg" alt="jais-logo">
+        </a>
     </nav>
 
     <div class="titleInventory">
@@ -124,6 +200,26 @@
                     </tr>
                 </tbody>
             </table>
+            <button class="cssbuttons-io-button">
+                Add Item
+                <div class="icon">
+                    <svg
+                      height="24"
+                      width="24"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M0 0h24v24H0z" fill="none"></path>
+                      <path
+                        d="M12 5v14m-7-7h14"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        fill="none"
+                        stroke-linecap="round"
+                      ></path>
+                    </svg>
+                  </div>                  
+              </button>
         </div>
     </div>
 

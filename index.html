@@ -24,16 +24,16 @@
             align-items: center;
         }
         #white{
-           background-color: #ffffff; 
-           display: flex;
+            display: flex;
         }
 
         #black{
             display: flex;
-            background-image: url(resources/pexels-tiger-lily-4483610.jpg);
+            background-image: url(resources/breadPat.jpg);
             background-size: cover;
             background-position: center;
-            background-repeat: no-repeat;
+            background-size: 500px 500px;
+            background-repeat: repeat;
             background-color: #1b1b1b;
             flex-direction: column;
             justify-content: center;
@@ -48,7 +48,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
+            background-color: rgba(159, 109,69, 0.9);
         }
 
         #black > * {
@@ -204,9 +204,6 @@
     </div>
 
     <script>
-        //import Swal from 'sweetalert2/dist/sweetalert2.js';
-
-
         document.addEventListener("DOMContentLoaded", function() {
         const loginForm = document.getElementById("login");
         const emailInput = document.getElementById("emailInput");

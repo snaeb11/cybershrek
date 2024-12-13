@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cambay:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <title>Document</title>
+
+    <style>
+        body{
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            font-family: 'Cambay', sans-serif;
+        }
+
+        .div{
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #white{
+           background-color: #ffffff; 
+           display: flex;
+        }
+
+        #black{
+            display: flex;
+            background-image: url(resources/breadPat.jpg);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #1b1b1b;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #black::before{
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(159, 109,69, 0.9);
+        }
+
+        #black > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        #welcome{
+            align-items: baseline;
+        }
+        
+        .textContainer{
+            display: flex;
+        }
+
+        #jais-logo{
+            height: auto;
+            max-width: 125%;
+        }
+
+        .welcomeContainer{
+            display: flex;
+            justify-content: center;
+        }
+        
+        #welcome{
+            font-size: 70px;
+            font-weight: 1000;
+            color: white;
+            margin: auto;
+        }
+
+        .formContainer{
+            display: flex;
+            justify-content: center;
+            width: 75%;
+        }
+
+        .form{
+            display: flex;
+            margin: 0;
+            flex-direction: column;
+            padding: 10%;
+            width: 50%;
+        }
+
+        .input{
+            border: none;
+            border-bottom: 1px solid white;
+            outline: none;
+            background-color: transparent;
+            color: white;
+            padding: 5px;
+            padding-bottom: 0;
+            font-size: 15px;
+        }
+
+        input::placeholder{
+            color: white;
+            opacity: 1;
+        }
+
+        input:focus{
+            border-bottom: 1px solid white;
+        }
+
+        a{
+            color: white;
+            text-decoration: none;
+            margin: 0;
+            padding: 0;
+            width: 50%;
+        }
+
+        a:visited{
+            color: white;
+        }
+
+        a:hover{
+            color: white;
+            text-decoration: underline;
+        }
+
+        a:active{
+            color: white;
+        }
+
+        .inputButton{
+            background: none;
+            border: none;
+            color: white;
+            font: inherit;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+            text-align: right;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .inputButton{
+            font-family: 'Cambay', sans-serif;
+            background: linear-gradient(to right, rgb(255, 196, 0),rgb(255, 255, 255),rgb(255, 174, 0));
+            background-size: 200% 200%;
+            animation: rainbow 2s ease-in-out infinite;
+            background-clip: text;
+            -webkit-background-clip:text;
+            color: #ffffff;
+            font-size:25px;
+            transition: color .2s ease-in-out;
+            font-weight:700;
+            background-color: white;
+        }
+
+        .inputButton:hover{
+            color:rgba(0,0,0,0);
+        }
+
+        .inputButton:focus{
+            border: none;
+        }
+
+        @keyframes rainbow { 
+            0%{background-position:left}
+            50%{background-position:right}
+            100%{background-position:left}
+        }
+
+    </style>
+</head>
+<body>
+    <div class="div" id="white">
+        <div class="textContainer">
+            <img src="resources/Vector.svg" alt="jais. logo" id="jais-logo">
+        </div>
+    </div>
+    <div class="div" id="black">
+
+            <div class="welcomeContainer">
+                <p class="text" id="welcome">welcome</p>
+            </div>
+    
+            <div class="formContainer">
+                <form action="" class="form" id="login">
+                    <input type="email" class="input" id="emailInput" placeholder="email" autocomplete="off">
+                    <br>
+                    <input type="firstPassword" class="input" id="passwordInput" placeholder="password" autocomplete="off">
+                    <br>
+                    <input type="secondPassword" class="input" id="passwordInput" placeholder="password" autocomplete="off">
+                    <br>
+                    <a href="index.html" id="skill-issu">Already have an account?</a>
+                    <input type="submit" class="inputButton" id="submit" value="create account">
+                </form>
+            </div>
+
+    </div>
+</body>
+</html>
