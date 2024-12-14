@@ -13,60 +13,88 @@
 </head>
 <body>
     <nav class="navbar" id="navbar">
-        <img src="resources/burger.svg" alt="">
-        <p class="adminType">Test</p>
-        <a href="index.html">
-            <img src="resources/small-Vector.svg" alt="jais-logo">
-        </a>
+        <ul>
+            <li>
+                <!--jais.-->
+                <span class="logo">
+                    <img src="resources/small-Vector.svg" alt="jais. logo" id="jais-logo" width="65" height="65">
+                </span>
+                <button onclick=toggleSidebar() id="toggle-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="m313-480 155 156q11 11 11.5 27.5T468-268q-11 11-28 11t-28-11L228-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T468-692q11 11 11 28t-11 28L313-480Zm264 0 155 156q11 11 11.5 27.5T732-268q-11 11-28 11t-28-11L492-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T732-692q11 11 11 28t-11 28L577-480Z"/></svg>
+                </button>
+            </li>
+            <li class="active">
+                <!--INVENTORY-->
+                <a href="inventory.html">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M200-80q-33 0-56.5-23.5T120-160v-451q-18-11-29-28.5T80-680v-120q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v120q0 23-11 40.5T840-611v451q0 33-23.5 56.5T760-80H200Zm0-520v440h560v-440H200Zm-40-80h640v-120H160v120Zm200 280h240v-80H360v80Zm120 20Z"/></svg>
+                    <span>Inventory</span>
+                </a>
+            </li>
+            <li>
+                <!--USER SETTING-->
+                <a href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg>
+                    <span>User Settings</span>
+                </a>
+            </li>
+            <li>
+                <!--LOGOUT-->
+                <a href="index.html">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
     </nav>
 
-    <div class="titleInventory">
-        <p class="text" id="inventoryTitle">Inventory</p>
-    </div>
-
-    <div class="wrapper">
-        <div class="tableContent">
-            <table id="myTable" class="display">
-                <thead>
-                    <tr>
-                        <th>Product ID</th>
-                        <th>Product Name</th>
-                        <th>Category</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!--dynamically generated from database -->
-                </tbody>
-            </table>
-            <button class="cssbuttons-io-button">
-                Add Item
-                <div class="icon">
-                    <svg
-                      height="24"
-                      width="24"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M0 0h24v24H0z" fill="none"></path>
-                      <path
-                        d="M12 5v14m-7-7h14"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        fill="none"
-                        stroke-linecap="round"
-                      ></path>
-                    </svg>
-                  </div>                  
-              </button>
+    <main>
+        <div class="titleInventory">
+            <p class="text" id="inventoryTitle">Inventory</p>
         </div>
-    </div>
-
+    
+        <div class="wrapper">
+            <div class="tableContent">
+                <table id="myTable" class="display">
+                    <thead>
+                        <tr>
+                            <th>Product ID</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--dynamically generated from database -->
+                    </tbody>
+                </table>
+                <button class="cssbuttons-io-button">
+                    Add Item
+                    <div class="icon">
+                        <svg
+                          height="24"
+                          width="24"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M0 0h24v24H0z" fill="none"></path>
+                          <path
+                            d="M12 5v14m-7-7h14"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            fill="none"
+                            stroke-linecap="round"
+                          ></path>
+                        </svg>
+                      </div>                  
+                  </button>
+            </div>
+        </div>
+    </main>
     <script src="lib/jQuery/jquery-3.7.1.min.js"></script>
     <script src="lib/datatables/dataTables.js"></script>
 
-    <script>
+    <script defer>
 
         document.addEventListener("DOMContentLoaded", function() {
         const adminType = new URLSearchParams(window.location.search).get('adminType');
@@ -88,6 +116,7 @@
                     <input type="number" step="0.01" id="price" class="swal2-input" placeholder="Price">
                 `,
                 confirmButtonText: 'Submit',
+                confirmButtonColor: '#9F6D45',
                 showCancelButton: true,
                 preConfirm: () => {
                     const productName = document.getElementById('productName').value;
@@ -162,6 +191,13 @@
                 });
         });
 
+        const toggleButton = document.getElementById('toggle-btn');
+        const sidebar = document.getElementById('sidebar');
+
+        function toggleSidebar(){
+            navbar.classList.toggle('close');
+            toggleButton.classList.toggle('rotate');
+        }
     </script>
 </body>
 </html>
