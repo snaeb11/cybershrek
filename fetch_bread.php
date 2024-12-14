@@ -1,6 +1,10 @@
 <?php
-header("Content-Type: application/json");
-require_once 'db_connection.php'; // Include your database connection script
+require_once 'config/db_connection.php';
+
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 $sql = "SELECT productId, productName, category, qty, price FROM bread";
 $result = $conn->query($sql);

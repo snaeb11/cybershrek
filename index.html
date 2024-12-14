@@ -36,46 +36,56 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-        const loginForm = document.getElementById("login");
-        const emailInput = document.getElementById("emailInput");
-        const passwordInput = document.getElementById("passwordInput");
+        document.addEventListener("DOMContentLoaded", function () {
+            const loginForm = document.getElementById("login");
+            const emailInput = document.getElementById("emailInput");
+            const passwordInput = document.getElementById("passwordInput");
 
-        const adminCredentials = {
-            email: "admin@gmail.com",
-            password: "admin123"
-        };
+            loginForm.addEventListener("submit", function (event) {
+                event.preventDefault();
 
-        const clerkCredentials = {
-            email: "clerk@gmail.com",
-            password: "clerk123"
-        };
+                const email = emailInput.value.trim();
+                const password = passwordInput.value.trim();
 
-        loginForm.addEventListener("submit", function(event) {
-            event.preventDefault();
+                console.log("Data being sent to login.php:", { email, password });
 
-            const enteredEmail = emailInput.value.trim();
-            const enteredPassword = passwordInput.value.trim();
-
-            if (enteredEmail === adminCredentials.email && enteredPassword === adminCredentials.password) {
-                alert("Login successful!: ADMIN");
-                loginRedirect("inventory.html", "SUPAAA ADMIN");
-            } else if (enteredEmail === clerkCredentials.email && enteredPassword === clerkCredentials.password) {
-                alert("Login successful!: CLERK");
-                loginRedirect("inventory.html", "Clerk");
-            } else {
-                alert("Skill Issue.\n admin: admin@gmail.com, password: admin123 \n clerk: clerk@gmail.com, password: clerk123");
-                passwordInput.value = "";
-            }
+                fetch("login.php", {
+                    method: "POST",
+                    body: new URLSearchParams({ email: email, password: password }),
+                })
+                .then(response => response.text())
+                .then(text => {
+                    console.log("Raw response text:", text);
+                    try {
+                        const data = JSON.parse(text);
+                        console.log("Received data from login.php:", data);
+                        if (data.success) {
+                            alert("Login successful!");
+                            loginRedirect("inventory.html", "Admin");
+                        } else {
+                            alert("Login failed: " + data.message);
+                            passwordInput.value = "";
+                        }
+                    } catch (e) {
+                        console.error("Error parsing JSON:", e);
+                        alert("An error occurred while processing the login response.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    alert("Something went wrong. Please try again.");
+                });
+            });
         });
-        });
+
+
+
 
         function loginRedirect(url, adminType) {
             window.location.href = `${url}?adminType=${adminType}`;
         }
 
         function loadConfigFile() {
-            // Retrieve config file to load database, tables, views, stored procedures/functions...
             fetch("config/config.php", {
                 method: "POST",
                 headers: {

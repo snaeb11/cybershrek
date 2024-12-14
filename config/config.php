@@ -4,8 +4,8 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once 'database.php';
-require_once 'db_connection.php';
+// Include the db_connection.php file
+require_once 'db_connection.php'; // Make sure to use the connection from here
 
 date_default_timezone_set('Asia/Manila');
 
@@ -21,6 +21,7 @@ try {
         );";
 
     if ($conn->query($sqlT) === TRUE) {
+        // Table created or already exists
     } else {
         echo "Error creating table: " . $conn->error;
     }
@@ -42,29 +43,29 @@ try {
     $retval = $stmt->get_result();
 
     if ($retval->num_rows > 0) {
-        // Then don't insert admin's account
+        // Admin account already exists, don't insert
     } else {
-        $stmt->close();
+        $stmt->close(); // Close previous statement before reuse
 
         // Insert Admin's Account
         $sqlInsertAdminAcc = "INSERT INTO accounts 
-                    (userId, firstName, lastName, pass, email, accType)
+                    (firstName, lastName, pass, email, accType)
                     VALUES 
-                        (NULL, ?, ?, ?, ?, ?)";
-                    $stmt = $conn->prepare($sqlInsertAdminAcc);
-                    $stmt->bind_param(
-                        "sssss",
-                        $adminW,
-                        $adminW,
-                        $adminPass,
-                        $adminEmail,
-                        $adminW
-                    );
+                        (?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sqlInsertAdminAcc);
+        $stmt->bind_param(
+            "sssss", 
+            $adminW, 
+            $adminW, 
+            $adminPass, 
+            $adminEmail, 
+            $adminW
+        );
 
         if ($stmt->execute()) {
             echo "success";
         } else {
-            echo 'Error: ' . $sql . "<br>" . $conn->error;
+            echo 'Error: ' . $sqlInsertAdminAcc . "<br>" . $conn->error;
         }
         $stmt->close();
     }
@@ -72,7 +73,7 @@ try {
     echo "Error: " . $e->getMessage();
 }
 
-/* Breab Table */
+/* Bread Table */
 try {
     $sqlT = "CREATE TABLE IF NOT EXISTS bread (
         productId INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
@@ -83,6 +84,7 @@ try {
         );";
 
     if ($conn->query($sqlT) === TRUE) {
+        // Table created or already exists
     } else {
         echo "Error creating table: " . $conn->error;
     }
@@ -90,5 +92,7 @@ try {
     echo $e->getMessage();
 }
 
+// Close the connection after all queries are completed
+$conn->close();
 
 ?>
