@@ -39,7 +39,7 @@
             </li>
             <li>
                 <!--LOGOUT-->
-                <a href="index.html">
+                <a href="javascript:void(0)" onclick="logout()" id="logout-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>
                     <span>Logout</span>
                 </a>
@@ -191,6 +191,7 @@
                 });
         });
 
+        //side bar
         const toggleButton = document.getElementById('toggle-btn');
         const sidebar = document.getElementById('sidebar');
 
@@ -198,6 +199,28 @@
             navbar.classList.toggle('close');
             toggleButton.classList.toggle('rotate');
         }
+        //side bar
+
+        //logout
+        const logoutButton = document.getElementById('logout-btn');
+        function logout() {
+            Swal.fire({
+                title: 'Logout',
+                text: 'Are you sure you want to logout?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#9F6D45',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Logout',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'index.html';
+                }
+            });
+        }
+        //logout
+        
     </script>
 </body>
 </html>
