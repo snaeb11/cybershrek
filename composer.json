@@ -1,0 +1,8 @@
+{
+    "require": {
+        "mmeyer2k/dcrypt": "^13.2"
+    },
+    "scripts": {
+        "post-clone-cmd": "composer install"
+    }
+}

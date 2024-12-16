@@ -1,0 +1,33 @@
+{
+  "name": "mmeyer2k/dcrypt",
+  "description": "A petite library of encryption functionality for PHP",
+  "keywords": [
+    "encryption",
+    "aes",
+    "gcm",
+    "openssl"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Michael Meyer",
+      "email": "m.meyer2k@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.1.0",
+    "ext-openssl": "*",
+    "ext-mbstring": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Dcrypt\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "classmap": [
+      "tests/"
+    ]
+  },
+  "minimum-stability": "dev"
+}
