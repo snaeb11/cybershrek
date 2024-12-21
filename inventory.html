@@ -219,10 +219,10 @@
                 confirmButtonColor: '#9F6D45',
                 showCancelButton: true,
                 preConfirm: () => {
-                    const productName = document.getElementById('editProductName').value;
-                    const category = document.getElementById('editCategory').value;
-                    const qty = document.getElementById('editQty').value;
-                    const price = document.getElementById('editPrice').value;
+                    const productName = sanitizeInput(document.getElementById('productName').value);
+                    const category = sanitizeInput(document.getElementById('category').value);
+                    const qty = sanitizeInput(document.getElementById('qty').value);
+                    const price = sanitizeInput(document.getElementById('price').value);
 
                     if (!productName || !category || !qty || !price) {
                         Swal.showValidationMessage('Please fill in all fields');

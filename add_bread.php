@@ -1,22 +1,27 @@
 <?php
-require_once 'config/db_connection.php'; // Include your database connection script
+require_once 'config/db_connection.php';
 
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-header('Content-Type: application/json'); // Ensure the response is in JSON format
+header('Content-Type: application/json');
+
+//sanitation fileter
+function sanitizeInput($input) {
+    return htmlspecialchars(strip_tags(trim($input)), ENT_QUOTES, 'UTF-8');
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve the POST data
-    $productName = $_POST['productName'];
-    $category = $_POST['category'];
-    $qty = $_POST['qty'];
-    $price = $_POST['price'];
+    $productName = sanitizeInput($_POST['productName']);
+    $category = sanitizeInput($_POST['category']);
+    $qty = filter_var($_POST['qty'], FILTER_VALIDATE_INT); 
+    $price = filter_var($_POST['price'], FILTER_VALIDATE_FLOAT);
 
     // Validate the input data
-    if (empty($productName) || empty($category) || empty($qty) || empty($price)) {
+    if (empty($productName) || empty($category) || !$qty || !$price) {
         echo json_encode(["success" => false, "message" => "Please fill in all fields"]);
         exit;
     }
