@@ -62,6 +62,7 @@
                             <th>Category</th>
                             <th>Quantity</th>
                             <th>Price</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -176,11 +177,14 @@
                             <td>${product.category}</td>
                             <td>${product.qty}</td>
                             <td>${product.price}</td>
+                            <td>
+                                <button class="edit-btn" id="action-btn" data-id="${product.productId}"><span>Edit</span></button>
+                                <button class="delete-btn" data-id="${product.productId}"><span>Delete</span></button>
+                            </td>
                         `;
                         tableBody.appendChild(row);
                     });
 
-                    // Re-initialize DataTable after adding rows
                     if (!$.fn.DataTable.isDataTable('#myTable')) {
                         $('#myTable').DataTable();
                     }
@@ -190,6 +194,69 @@
                     alert('Error fetching data');
                 });
         });
+
+        //ebit
+        $(document).on('click', '.edit-btn', function() {
+            const productId = $(this).data('id');
+            Swal.fire({
+                title: 'Edit Product',
+                html: `
+                    <input type="text" id="editProductName" class="swal2-input" placeholder="Product Name">
+                    <input type="text" id="editCategory" class="swal2-input" placeholder="Category">
+                    <input type="number" id="editQty" class="swal2-input" placeholder="Quantity">
+                    <input type="number" step="0.01" id="editPrice" class="swal2-input" placeholder="Price">
+                `,
+                confirmButtonText: 'Update',
+                confirmButtonColor: '#9F6D45',
+                showCancelButton: true,
+                preConfirm: () => {
+                    const productName = document.getElementById('editProductName').value;
+                    const category = document.getElementById('editCategory').value;
+                    const qty = document.getElementById('editQty').value;
+                    const price = document.getElementById('editPrice').value;
+
+                    if (!productName || !category || !qty || !price) {
+                        Swal.showValidationMessage('Please fill in all fields');
+                        return false;
+                    }
+
+                    return { productId, productName, category, qty, price };
+                }
+            }).then(result => {
+                if (result.isConfirmed) {
+                    const { productId, productName, category, qty, price } = result.value;
+                    //lujik 'ere
+                    Swal.fire('Updated!', `Product ID: ${productId} updated successfully.`, 'success');
+                }
+            });
+        });
+
+        //delemts
+        $(document).on('click', '.delete-btn', function() {
+            const productId = $(this).data('id');
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `You are about to delete product ID: ${productId}. This action cannot be undone.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#9F6D45'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    //lujik 'ere
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: `Product ID: ${productId} has been deleted.`,
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#9F6D45'
+                    });
+                }
+            });
+        });
+
 
         //side bar
         const toggleButton = document.getElementById('toggle-btn');
@@ -209,8 +276,8 @@
                 text: 'Are you sure you want to logout?',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#9F6D45',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#9F6D45',
                 confirmButtonText: 'Logout',
                 cancelButtonText: 'Cancel'
             }).then((result) => {
