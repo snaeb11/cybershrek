@@ -1,0 +1,57 @@
+{
+    "packages": [
+        {
+            "name": "mmeyer2k/dcrypt",
+            "version": "13.2.0",
+            "version_normalized": "13.2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mmeyer2k/dcrypt.git",
+                "reference": "32c05c0db407ea3a303b7762d8939e503950cf3d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mmeyer2k/dcrypt/zipball/32c05c0db407ea3a303b7762d8939e503950cf3d",
+                "reference": "32c05c0db407ea3a303b7762d8939e503950cf3d",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "ext-openssl": "*",
+                "php": ">=7.1.0"
+            },
+            "time": "2022-04-14T04:51:11+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Dcrypt\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Meyer",
+                    "email": "m.meyer2k@gmail.com"
+                }
+            ],
+            "description": "A petite library of encryption functionality for PHP",
+            "keywords": [
+                "aes",
+                "encryption",
+                "gcm",
+                "openssl"
+            ],
+            "support": {
+                "issues": "https://github.com/mmeyer2k/dcrypt/issues",
+                "source": "https://github.com/mmeyer2k/dcrypt/tree/13.2.0"
+            },
+            "install-path": "../mmeyer2k/dcrypt"
+        }
+    ],
+    "dev": true,
+    "dev-package-names": []
+}

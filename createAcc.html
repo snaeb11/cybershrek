@@ -1,39 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cambay:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/createAcc.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cambay:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/createAcc.css" />
     <title>Document</title>
-</head>
-<body>
+  </head>
+  <body>
     <div class="div" id="white">
-        <div class="textContainer">
-            <img src="resources/Vector.svg" alt="jais. logo" id="jais-logo">
-        </div>
+      <div class="textContainer">
+        <img src="resources/Vector.svg" alt="jais. logo" id="jais-logo" />
+      </div>
     </div>
     <div class="div" id="black">
+      <div class="welcomeContainer">
+        <p class="text" id="welcome">welcome</p>
+      </div>
 
-            <div class="welcomeContainer">
-                <p class="text" id="welcome">sign up!</p>
-            </div>
-    
-            <div class="formContainer">
-                <form action="" class="form" id="login">
-                    <input type="email" class="input" id="emailInput" placeholder="email" autocomplete="off">
-                    <br>
-                    <input type="firstPassword" class="input" id="passwordInput" placeholder="password" autocomplete="off">
-                    <br>
-                    <input type="secondPassword" class="input" id="passwordInput" placeholder="password" autocomplete="off">
-                    <br>
-                    <a href="index.html" id="skill-issu">Already have an account?</a>
-                    <input type="submit" class="inputButton" id="submit" value="create account">
-                </form>
-            </div>
-
+      <div class="formContainer">
+        <form action="createAccount.php" class="form" id="login">
+          <input
+            type="text"
+            class="input"
+            id="firstName"
+            placeholder="First Name"
+            autocomplete="off"
+          />
+          <br />
+          <input
+            type="text"
+            class="input"
+            id="lastName"
+            placeholder="Last Name"
+            autocomplete="off"
+          />
+          <br /><br />
+          <input
+            type="email"
+            class="input"
+            id="emailInput"
+            placeholder="Email"
+            autocomplete="off"
+          />
+          <br />
+          <input
+            type="password"
+            class="input"
+            id="passwordInput"
+            placeholder="Password"
+            autocomplete="off"
+          />
+          <br />
+          <input
+            type="password"
+            class="input"
+            id="passwordInput"
+            placeholder="Confirm Password"
+            autocomplete="off"
+          />
+          <br />
+          <a href="index.html" id="skill-issu">Already have an account?</a>
+          <input
+            type="submit"
+            class="inputButton"
+            id="submit"
+            value="create account"
+          />
+        </form>
+      </div>
     </div>
-</body>
+  </body>
 </html>
