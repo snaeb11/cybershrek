@@ -3,15 +3,20 @@
 require_once __DIR__ . '/vendor/autoload.php';
 
 // Load environment variables from .env file
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
-echo 'Encryption Key: ' . getenv('ENCRYPTION_KEY') . '<br>';
+$envFile = '.env';
+$envContents = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+$envVariables = [];
+foreach ($envContents as $line) {
+    list($key, $value) = explode('=', $line, 2);
+    $envVariables[$key] = trim($value);
+}
 
 // Include the database connection configuration file
 $conn = require_once 'config/db_connection.php';
 
-// Fetch the encryption key from the environment
-$key = getenv('ENCRYPTION_KEY');
+// Get the value of the ENCRYPTION_KEY environment variable
+$key = $envVariables['ENCRYPTION_KEY'];
 
 // Ensure the key is set in the environment
 if (!$key) {
@@ -27,12 +32,6 @@ function sanitizeInput($input) {
 function encryptPassword($password) {
     global $key;
     return \Dcrypt\Aes::encrypt($password, $key);
-}
-
-// Define a function to decrypt data (optional, for password retrieval)
-function decryptPassword($encryptedPassword) {
-    global $key;
-    return \Dcrypt\Aes::decrypt($encryptedPassword, $key);
 }
 
 // Define the function to create a new account
