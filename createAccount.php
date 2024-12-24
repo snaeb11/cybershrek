@@ -35,16 +35,16 @@ function encryptPassword($password) {
 }
 
 // Define the function to create a new account
-function createAccount($firstName, $lastName, $pass, $email, $accType = 'Admin') {
+function createAccount($firstName, $lastName, $pass, $email, $roleId = 3) {  // Default roleId set to 3 (clerk)
     global $conn;
 
     // Encrypt the password securely using Dcrypt
     $passwordHash = encryptPassword($pass);
 
     // Insert the new account into the database
-    $query = "INSERT INTO accounts (firstName, lastName, pass, email, accType) VALUES (?, ?, ?, ?, ?)";
+    $query = "INSERT INTO accounts (firstName, lastName, pass, email, roleId) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("sssss", $firstName, $lastName, $passwordHash, $email, $accType);
+    $stmt->bind_param("sssss", $firstName, $lastName, $passwordHash, $email, $roleId);
     $result = $stmt->execute();
 
     // Check if the account was created successfully
@@ -65,8 +65,8 @@ if (isset($_POST['submit'])) {
     $pass = sanitizeInput($_POST['pass']);
     $email = sanitizeInput($_POST['email']);
     
-    // Set the $accType field to "Clerk"
-    $accType = 'Clerk';
+    // Set the roleId field to "Clerk" (default value 3)
+    $roleId = 3; // Clerk role by default
 
     // Validate the form data
     if (empty($firstName) || empty($lastName) || empty($pass) || empty($email)) {
@@ -75,7 +75,7 @@ if (isset($_POST['submit'])) {
         echo "Invalid email address.";
     } else {
         // Create the new account
-        if (createAccount($firstName, $lastName, $pass, $email, $accType)) {
+        if (createAccount($firstName, $lastName, $pass, $email, $roleId)) {
             echo "Successfully created an account.";
             // Redirect to the index/login screen
             header('Location: index.html');
