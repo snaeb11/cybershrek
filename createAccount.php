@@ -2,6 +2,10 @@
 // Include the database connection configuration file
 $conn = require_once 'config/db_connection.php';
 
+function sanitizeInput($input) {
+    return htmlspecialchars(strip_tags(trim($input)), ENT_QUOTES, 'UTF-8');
+}
+
 // Define the function to create a new account
 function createAccount($firstName, $lastName, $pass, $email, $accType) {
     global $conn;
@@ -26,11 +30,11 @@ function createAccount($firstName, $lastName, $pass, $email, $accType) {
 // Check if the form has been submitted
 if (isset($_POST['submit'])) {
     // Get the form data
-    $firstName = $_POST['firstName'];
-    $lastName = $_POST['lastName'];
-    $pass = $_POST['pass'];
-    $email = $_POST['email'];
-    $accType = $_POST['accType'];
+    $firstName = sanitizeInput($_POST['firstName']);
+    $lastName = sanitizeInput($_POST['lastName']);
+    $pass = sanitizeInput($_POST['pass']);
+    $email = sanitizeInput($_POST['email']);
+    $accType = sanitizeInput($_POST['accType']);
 
     // Validate the form data
     if (empty($firstName) || empty($lastName) || empty($pass) || empty($email) || empty($accType)) {
