@@ -57,11 +57,19 @@
         const emailInput = document.getElementById("emailInput");
         const passwordInput = document.getElementById("passwordInput");
 
+        //sanitation
+        function sanitizeInput(input) {
+            input = input.replace(/<\/?[^>]+(>|$)/g, "");
+            const temp = document.createElement('div');
+            temp.textContent = input.trim();
+            return temp.innerHTML;
+        }
+
         loginForm.addEventListener("submit", function (event) {
           event.preventDefault();
 
-          const email = emailInput.value.trim();
-          const password = passwordInput.value.trim();
+          const email = sanitizeInput(emailInput.value.trim());
+          const password = sanitizeInput(passwordInput.value.trim());
 
           console.log("Data being sent to login.php:", { email, password });
 

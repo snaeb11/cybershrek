@@ -7,9 +7,13 @@ error_reporting(E_ALL);
 
 header('Content-Type: application/json');
 
+function sanitizeInput($input) {
+    return htmlspecialchars(strip_tags(trim($input)), ENT_QUOTES, 'UTF-8');
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
+    $email = sanitizeInput($_POST['email'] ?? '');
+    $password = sanitizeInput($_POST['password'] ?? '');
 
     if (empty($email) || empty($password)) {
         echo json_encode(['success' => false, 'message' => 'Please fill in all fields!']);
