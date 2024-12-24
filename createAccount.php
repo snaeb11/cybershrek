@@ -1,17 +1,46 @@
 <?php
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+// Load environment variables from .env file
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+echo 'Encryption Key: ' . getenv('ENCRYPTION_KEY') . '<br>';
+
 // Include the database connection configuration file
 $conn = require_once 'config/db_connection.php';
 
+// Fetch the encryption key from the environment
+$key = getenv('ENCRYPTION_KEY');
+
+// Ensure the key is set in the environment
+if (!$key) {
+    die('Encryption key is not set in the .env file.');
+}
+
+// Sanitize user input
 function sanitizeInput($input) {
     return htmlspecialchars(strip_tags(trim($input)), ENT_QUOTES, 'UTF-8');
 }
 
+// Define a function to securely encrypt data using Dcrypt
+function encryptPassword($password) {
+    global $key;
+    return \Dcrypt\Aes::encrypt($password, $key);
+}
+
+// Define a function to decrypt data (optional, for password retrieval)
+function decryptPassword($encryptedPassword) {
+    global $key;
+    return \Dcrypt\Aes::decrypt($encryptedPassword, $key);
+}
+
 // Define the function to create a new account
-function createAccount($firstName, $lastName, $pass, $email, $accType) {
+function createAccount($firstName, $lastName, $pass, $email, $accType = 'Admin') {
     global $conn;
 
-    // Hash the password using the dcrypt library
-    $passwordHash = dcrypt_encrypt($pass);
+    // Encrypt the password securely using Dcrypt
+    $passwordHash = encryptPassword($pass);
 
     // Insert the new account into the database
     $query = "INSERT INTO accounts (firstName, lastName, pass, email, accType) VALUES (?, ?, ?, ?, ?)";
@@ -21,8 +50,10 @@ function createAccount($firstName, $lastName, $pass, $email, $accType) {
 
     // Check if the account was created successfully
     if ($result) {
+        echo "Account created successfully!";
         return true;
     } else {
+        echo "Error creating account: " . $stmt->error;
         return false;
     }
 }
@@ -34,24 +65,22 @@ if (isset($_POST['submit'])) {
     $lastName = sanitizeInput($_POST['lastName']);
     $pass = sanitizeInput($_POST['pass']);
     $email = sanitizeInput($_POST['email']);
-    $accType = sanitizeInput($_POST['accType']);
+    
+    // Set the $accType field to "Clerk"
+    $accType = 'Clerk';
 
     // Validate the form data
-    if (empty($firstName) || empty($lastName) || empty($pass) || empty($email) || empty($accType)) {
+    if (empty($firstName) || empty($lastName) || empty($pass) || empty($email)) {
         echo "Please fill out all fields.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         echo "Invalid email address.";
     } else {
-        // Sanitize the form data
-        $firstName = htmlspecialchars($firstName);
-        $lastName = htmlspecialchars($lastName);
-        $pass = htmlspecialchars($pass);
-        $email = htmlspecialchars($email);
-        $accType = htmlspecialchars($accType);
-
         // Create the new account
         if (createAccount($firstName, $lastName, $pass, $email, $accType)) {
-            echo "Account created successfully!";
+            echo "Successfully created an account.";
+            // Redirect to the index/login screen
+            header('Location: index.html');
+            exit;
         } else {
             echo "Error creating account.";
         }

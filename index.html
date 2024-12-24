@@ -59,10 +59,10 @@
 
         //sanitation
         function sanitizeInput(input) {
-            input = input.replace(/<\/?[^>]+(>|$)/g, "");
-            const temp = document.createElement('div');
-            temp.textContent = input.trim();
-            return temp.innerHTML;
+          input = input.replace(/<\/?[^>]+(>|$)/g, "");
+          const temp = document.createElement("div");
+          temp.textContent = input.trim();
+          return temp.innerHTML;
         }
 
         loginForm.addEventListener("submit", function (event) {
