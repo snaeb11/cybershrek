@@ -31,7 +31,8 @@ function sanitizeInput($input) {
 // Define a function to securely encrypt data using Dcrypt
 function encryptPassword($password) {
     global $key;
-    return \Dcrypt\Aes::encrypt($password, $key);
+    $encryptedData = \Dcrypt\Aes::encrypt($password, $key);
+    return base64_encode($encryptedData);
 }
 
 // Define the function to create a new account
@@ -70,18 +71,18 @@ if (isset($_POST['submit'])) {
 
     // Validate the form data
     if (empty($firstName) || empty($lastName) || empty($pass) || empty($email)) {
-        echo "Please fill out all fields.";
+        echo "<script>alert('Please fill out all fields.');</script>";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        echo "Invalid email address.";
+        echo "<script>alert('Invalid email address.');</script>";
     } else {
         // Create the new account
         if (createAccount($firstName, $lastName, $pass, $email, $roleId)) {
-            echo "Successfully created an account.";
+            echo "<script>alert('Successfully created an account.');</script>";
             // Redirect to the index/login screen
-            header('Location: index.html');
+            echo "<script>window.location.href = 'index.html';</script>";
             exit;
         } else {
-            echo "Error creating account.";
+            echo "<script>alert('Error creating account.');</script>";
         }
     }
 }
