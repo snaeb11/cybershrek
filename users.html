@@ -175,10 +175,12 @@
             modifyButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     const userId = button.dataset.userId;
+                    button.setAttribute('data-user-id', userId); // Ensure userId is set for saving
                     showPopup(userId);
                 });
             });
         }
+
 
         document.getElementById('cancelButton').addEventListener('click', () => {
             document.getElementById('popup').style.display = 'none';
@@ -186,6 +188,20 @@
 
 
         function save() {
+            const userId = document.querySelector('.action-btn[data-user-id]').dataset.userId;
+
+            const permissions = [];
+            const inventoryRow = document.getElementById('inventoryRow').querySelectorAll('input');
+            const accountRow = document.getElementById('accountRow').querySelectorAll('input');
+
+            if (inventoryRow[0].checked) permissions.push('inventory:view');
+            if (inventoryRow[1].checked) permissions.push('inventory:add');
+            if (inventoryRow[2].checked) permissions.push('inventory:edit');
+            if (inventoryRow[3].checked) permissions.push('inventory:delete');
+
+            if (accountRow[0].checked) permissions.push('manage:admin');
+            if (accountRow[1].checked) permissions.push('manage:clerk');
+
             Swal.fire({
                 title: 'Confirm Save',
                 text: 'Are you sure you want to save these changes?',
@@ -197,15 +213,30 @@
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Swal.fire(
-                        'Saved!',
-                        'Your changes have been saved successfully.',
-                        'success'
-                    );
-                    popup.style.display = 'none';
+                    fetch('save_user_permissions.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ userId, permissions })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            Swal.fire('Saved!', data.message, 'success');
+                            popup.style.display = 'none';
+                        } else {
+                            Swal.fire('Error!', data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error saving permissions:', error);
+                        Swal.fire('Error!', 'An error occurred while saving permissions.', 'error');
+                    });
                 }
             });
         }
+
 
         function logout() {
             Swal.fire({
