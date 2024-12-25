@@ -72,7 +72,7 @@
         <div id="popup" class="popup">
             <div class="popup-content">
                 <h2>Modify User</h2>
-                <h3 id="userRole">Role: </h3>
+                <h3 id="userInfo">Name: </h3>
                 <table class="popup-table">
                     <thead>
                         <tr>
@@ -91,12 +91,19 @@
                             <td><input type="checkbox" class="update" id="inv-ipd"></td>
                             <td><input type="checkbox" class="delete" id="inv-del"></td>
                         </tr>
+                    </tbody>
+                    <thead>
+                        <tr>
+                            <th>Access</th>
+                            <th>Admin</th>
+                            <th>Clerk</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         <tr id="accountRow">
                             <td>Account Management</td>
-                            <td><input type="checkbox" class="read" id="acc-read"></td>
-                            <td><input type="checkbox" class="add" id="acc-add"></td>
-                            <td><input type="checkbox" class="update" id="acc-upd"></td>
-                            <td><input type="checkbox" class="delete" id="acc-del"></td>
+                            <td><input type="checkbox" class="admin" id="acc-admin"></td>
+                            <td><input type="checkbox" class="clerk" id="acc-clerk"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -115,78 +122,63 @@
         let rolesData = [];
 
         document.addEventListener('DOMContentLoaded', () => {
-            fetch('get_role_permissions.php')
+            fetch('get_accounts.php')
                 .then(response => response.json())
-                .then(data => {
-                    rolesData = data;
-                    console.log('Roles and permissions:', rolesData);
-                    console.log("Roles Array:", roles);
-                    console.log("Accessing role at index 1:", roles[1]);
+                .then(accounts => {
+                    const tableBody = document.querySelector("#userTable tbody");
+                    tableBody.innerHTML = '';
 
-
-                    // Populate the table with accounts
-                    fetch('get_accounts.php')
-                        .then(response => response.json())
-                        .then(accounts => {
-                            const tableBody = document.querySelector("#userTable tbody");
-                            tableBody.innerHTML = '';
-
-                            accounts.forEach(account => {
-                                const row = document.createElement('tr');
-                                row.innerHTML = `
-                                    <td>${account.firstName} ${account.lastName}</td>
-                                    <td>
-                                        <button class="action-btn" data-role-id="${account.roleId}"><span>Modify</span></button>
-                                    </td>
-                                `;
-                                tableBody.appendChild(row);
-                            });
-
-                            attachModifyListeners();
-                        });
-                })
-                .catch(error => console.error('Error fetching roles and permissions:', error));
-            });
-
-            function showPopup(roleId) {
-                const role = rolesData.find(r => r.roleId == roleId);
-                if (!role) {
-                    console.error('Role not found:', roleId);
-                    return;
-                }
-
-                const userRole = document.getElementById('userRole');
-                userRole.textContent = `Role: ${role.roleName}`;
-
-                const inventoryRow = document.getElementById('inventoryRow').querySelectorAll('input');
-                const accountRow = document.getElementById('accountRow').querySelectorAll('input');
-
-                // Reset all checkboxes
-                [...inventoryRow, ...accountRow].forEach(input => input.checked = false);
-
-                // Apply permissions
-                const permissions = role.permissions;
-                if (permissions.includes('inventory:view')) inventoryRow[0].checked = true;
-                if (permissions.includes('inventory:add')) inventoryRow[1].checked = true;
-                if (permissions.includes('inventory:edit')) inventoryRow[2].checked = true;
-                if (permissions.includes('inventory:delete')) inventoryRow[3].checked = true;
-
-                if (permissions.includes('manage:admin')) accountRow[0].checked = true; // Example for accounts
-                if (permissions.includes('manage:clerk')) accountRow[1].checked = true;
-
-                popup.style.display = 'block';
-                }
-
-            function attachModifyListeners() {
-                const modifyButtons = document.querySelectorAll('.action-btn');
-                modifyButtons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        const roleId = button.dataset.roleId;
-                        showPopup(roleId);
+                    accounts.forEach(account => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${account.firstName} ${account.lastName}</td>
+                            <td>
+                                <button class="action-btn" data-user-id="${account.userId}"><span>Modify</span></button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
                     });
-                });
-                }
 
+                    attachModifyListeners();
+                });
+        });
+
+        function showPopup(userId) {
+            const inventoryRow = document.getElementById('inventoryRow').querySelectorAll('input');
+            const accountRow = document.getElementById('accountRow').querySelectorAll('input');
+
+            [...inventoryRow, ...accountRow].forEach(input => (input.checked = false));
+
+            fetch(`get_users_permissions.php?userId=${userId}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    
+                    userInfo.innerText = `Name: ${data.firstName} ${data.lastName}`;
+
+                    const permissionList = data.permissions.split(',').map((perm) => perm.trim());
+
+                    inventoryRow[0].checked = permissionList.includes('inventory:view');
+                    inventoryRow[1].checked = permissionList.includes('inventory:add');
+                    inventoryRow[2].checked = permissionList.includes('inventory:edit');
+                    inventoryRow[3].checked = permissionList.includes('inventory:delete');
+
+                    accountRow[0].checked = permissionList.includes('manage:admin');
+                    accountRow[1].checked = permissionList.includes('manage:clerk');
+
+                    popup.style.display = 'block';
+                })
+                .catch((error) => console.error('Error fetching user permissions:', error));
+        }
+
+        function attachModifyListeners() {
+            const modifyButtons = document.querySelectorAll('.action-btn');
+            modifyButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const userId = button.dataset.userId;
+                    showPopup(userId);
+                });
+            });
+        }
 
         document.getElementById('cancelButton').addEventListener('click', () => {
             document.getElementById('popup').style.display = 'none';

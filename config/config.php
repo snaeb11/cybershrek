@@ -31,22 +31,6 @@ function encryptPassword($password, $key) {
     return base64_encode($encryptedData);
 }
 
-// Create Roles Table
-try {
-    $sqlT = "CREATE TABLE IF NOT EXISTS roles (
-        roleId INT AUTO_INCREMENT PRIMARY KEY,
-        roleName VARCHAR(50) NOT NULL
-    );";
-
-    if ($conn->query($sqlT) === TRUE) {
-        echo "Roles table created successfully.<br>";
-    } else {
-        echo "Error creating Roles table: " . $conn->error . "<br>";
-    }
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage() . "<br>";
-}
-
 // Create Accounts Table
 try {
     $sqlT = "CREATE TABLE IF NOT EXISTS accounts (
@@ -55,8 +39,7 @@ try {
         lastName VARCHAR(255) NOT NULL,
         pass VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL UNIQUE,
-        roleId INT NOT NULL,
-        FOREIGN KEY (roleId) REFERENCES roles(roleId) ON DELETE CASCADE
+        permission VARCHAR(599) NOT NULL
     );";
 
     if ($conn->query($sqlT) === TRUE) {
@@ -68,94 +51,11 @@ try {
     echo "Error: " . $e->getMessage() . "<br>";
 }
 
-// Create Permissions Table
-try {
-    $sqlT = "CREATE TABLE IF NOT EXISTS permissions (
-        permissionId INT AUTO_INCREMENT PRIMARY KEY,
-        permissionName VARCHAR(255) NOT NULL
-    );";
-
-    if ($conn->query($sqlT) === TRUE) {
-        echo "Permissions table created successfully.<br>";
-    } else {
-        echo "Error creating Permissions table: " . $conn->error . "<br>";
-    }
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage() . "<br>";
-}
-
-// Create Role-Permissions Table
-try {
-    $sqlT = "CREATE TABLE IF NOT EXISTS role_permissions (
-        roleId INT NOT NULL,
-        permissionId INT NOT NULL,
-        PRIMARY KEY (roleId, permissionId),
-        FOREIGN KEY (roleId) REFERENCES roles(roleId) ON DELETE CASCADE,
-        FOREIGN KEY (permissionId) REFERENCES permissions(permissionId) ON DELETE CASCADE
-    );";
-
-    if ($conn->query($sqlT) === TRUE) {
-        echo "Role-Permissions table created successfully.<br>";
-    } else {
-        echo "Error creating Role-Permissions table: " . $conn->error . "<br>";
-    }
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage() . "<br>";
-}
-
-// Insert Roles
-try {
-    $sqlInsertRoles = "INSERT IGNORE INTO roles (roleName) VALUES 
-                        ('super admin'),
-                        ('admin'),
-                        ('clerk');";
-    if ($conn->query($sqlInsertRoles) === TRUE) {
-        echo "Roles inserted successfully.<br>";
-    } else {
-        echo "Error inserting Roles: " . $conn->error . "<br>";
-    }
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage() . "<br>";
-}
-
-// Insert Permissions
-try {
-    $sqlInsertPermissions = "INSERT IGNORE INTO permissions (permissionName) VALUES 
-                             ('inventory:view'),
-                             ('inventory:add'),
-                             ('inventory:edit'),
-                             ('inventory:delete'),
-                             ('manage:admin'),
-                             ('manage:clerk');";
-    if ($conn->query($sqlInsertPermissions) === TRUE) {
-        echo "Permissions inserted successfully.<br>";
-    } else {
-        echo "Error inserting Permissions: " . $conn->error . "<br>";
-    }
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage() . "<br>";
-}
-
-// Insert Role-Permissions
-try {
-    $sqlInsertRolePermissions = "INSERT IGNORE INTO role_permissions (roleId, permissionId) VALUES 
-                                 (1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), 
-                                 (2, 1), (2, 2), (2, 3), (2, 4), (2, 6), 
-                                 (3, 1);";
-    if ($conn->query($sqlInsertRolePermissions) === TRUE) {
-        echo "Role-Permissions mappings inserted successfully.<br>";
-    } else {
-        echo "Error inserting Role-Permissions: " . $conn->error . "<br>";
-    }
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage() . "<br>";
-}
-
 // Insert Default Admin Account
 try {
     $adminPass = encryptPassword("admin123", $key); // Encrypt the password using Dcrypt
-    $sqlInsertAdmin = "INSERT IGNORE INTO accounts (firstName, lastName, pass, email, roleId) VALUES 
-                       ('Admin', 'Admin', ?, 'admin@gmail.com', 1);";
+    $sqlInsertAdmin = "INSERT IGNORE INTO accounts (firstName, lastName, pass, email, permission) VALUES 
+                       ('Admin', 'Admin', ?, 'admin@gmail.com', 'inventory:view, inventory:add, inventory:edit, inventory:delete, manage:admin, manage:clerk');";
 
     $stmt = $conn->prepare($sqlInsertAdmin);
     $stmt->bind_param("s", $adminPass);
