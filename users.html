@@ -60,7 +60,7 @@
                 <table class="table" id="userTable">
                     <thead>
                         <tr>
-                            <th>Username</th>
+                            <th>Account Name</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -149,10 +149,12 @@
 
             [...inventoryRow, ...accountRow].forEach(input => (input.checked = false));
 
+            // Save the userId to the popup for reference during save
+            document.getElementById('popup').setAttribute('data-user-id', userId);
+
             fetch(`get_users_permissions.php?userId=${userId}`)
                 .then((response) => response.json())
                 .then((data) => {
-                    
                     userInfo.innerText = `Name: ${data.firstName} ${data.lastName}`;
 
                     const permissionList = data.permissions.split(',').map((perm) => perm.trim());
@@ -175,11 +177,11 @@
             modifyButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     const userId = button.dataset.userId;
-                    button.setAttribute('data-user-id', userId); // Ensure userId is set for saving
                     showPopup(userId);
                 });
             });
         }
+
 
 
         document.getElementById('cancelButton').addEventListener('click', () => {
@@ -188,9 +190,10 @@
 
 
         function save() {
-            const userId = document.querySelector('.action-btn[data-user-id]').dataset.userId;
+            const userId = document.getElementById('popup').getAttribute('data-user-id');
 
             const permissions = [];
+
             const inventoryRow = document.getElementById('inventoryRow').querySelectorAll('input');
             const accountRow = document.getElementById('accountRow').querySelectorAll('input');
 
@@ -202,9 +205,11 @@
             if (accountRow[0].checked) permissions.push('manage:admin');
             if (accountRow[1].checked) permissions.push('manage:clerk');
 
+            console.log('Permissions:', permissions);
+
             Swal.fire({
                 title: 'Confirm Save',
-                text: 'Are you sure you want to save these changes?',
+                text: `Are you sure you want to save these changes?\nPermissions: ${permissions.join(', ')}\nFor: ${userInfo.innerText.replace('Name: ', '')}`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#9F6D45',
@@ -213,6 +218,7 @@
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
+                    console.log("works here");
                     fetch('save_user_permissions.php', {
                         method: 'POST',
                         headers: {
@@ -222,7 +228,12 @@
                     })
                     .then(response => response.json())
                     .then(data => {
+                        console.log("Save response:", data);
+                
                         if (data.status === 'success') {
+                            console.log("Saved Permissions:", permissions);
+                            console.log("Saved for UserId:", userId);
+                            
                             Swal.fire('Saved!', data.message, 'success');
                             popup.style.display = 'none';
                         } else {
@@ -236,6 +247,7 @@
                 }
             });
         }
+
 
 
         function logout() {
