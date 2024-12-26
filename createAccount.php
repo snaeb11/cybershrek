@@ -36,16 +36,16 @@ function encryptPassword($password) {
 }
 
 // Define the function to create a new account
-function createAccount($firstName, $lastName, $pass, $email, $roleId = 3) {  // Default roleId set to 3 (clerk)
+function createAccount($firstName, $lastName, $pass, $email, $permission = "inventory:view") {  // Default permission set to inventory:view (clerk)
     global $conn;
 
     // Encrypt the password securely using Dcrypt
     $passwordHash = encryptPassword($pass);
 
     // Insert the new account into the database
-    $query = "INSERT INTO accounts (firstName, lastName, pass, email, roleId) VALUES (?, ?, ?, ?, ?)";
+    $query = "INSERT INTO accounts (firstName, lastName, pass, email, permission) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("sssss", $firstName, $lastName, $passwordHash, $email, $roleId);
+    $stmt->bind_param("sssss", $firstName, $lastName, $passwordHash, $email, $permission);
     $result = $stmt->execute();
 
     // Check if the account was created successfully
@@ -67,7 +67,7 @@ if (isset($_POST['submit'])) {
     $email = sanitizeInput($_POST['email']);
     
     // Set the roleId field to "Clerk" (default value 3)
-    $roleId = 3; // Clerk role by default
+    $permission = "inventory:view"; // Clerk role by default
 
     // Validate the form data
     if (empty($firstName) || empty($lastName) || empty($pass) || empty($email)) {
@@ -76,7 +76,7 @@ if (isset($_POST['submit'])) {
         echo "<script>alert('Invalid email address.');</script>";
     } else {
         // Create the new account
-        if (createAccount($firstName, $lastName, $pass, $email, $roleId)) {
+        if (createAccount($firstName, $lastName, $pass, $email, $permission)) {
             echo "<script>alert('Successfully created an account.');</script>";
             // Redirect to the index/login screen
             echo "<script>window.location.href = 'index.html';</script>";
