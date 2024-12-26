@@ -55,13 +55,24 @@ function authenticateUser($email, $password) {
 
         // Compare the decrypted password with the user-provided password
         if ($password === $decryptedPassword) {
-            return ['success' => true, 'message' => 'Login successful!', 'user' => $user];
+            // Start a session and store user data, including permissions
+            session_start();
+            $_SESSION['user'] = [
+                'id' => $user['userId'],
+                'firstName' => $user['firstName'],
+                'lastName' => $user['lastName'],
+                'email' => $user['email'],
+                'permissions' => explode(',', $user['permission'])
+            ];
+
+            return ['success' => true, 'message' => 'Login successful!', 'user' => $_SESSION['user']];
         }
     }
 
     // If no match is found or passwords don't match
     return ['success' => false, 'message' => 'Invalid email or password!'];
 }
+
 
 // Main login process
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
