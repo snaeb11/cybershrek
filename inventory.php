@@ -29,6 +29,8 @@
         $canAddInventory = in_array('inventory:add', $permissions);
         $canEditInventory = in_array('inventory:edit', $permissions);
         $canDeleteInventory = in_array('inventory:delete', $permissions);
+        $canManageAdmin = in_array('manage:admin', $permissions);
+        $canManageClerk = in_array('manage:clerk', $permissions);
 
         echo "<script>
             var userId = " . json_encode($userId) . ";
@@ -36,8 +38,10 @@
             var canAddInventory = " . ($canAddInventory ? 'true' : 'false') . ";
             var canEditInventory = " . ($canEditInventory ? 'true' : 'false') . ";
             var canDeleteInventory = " . ($canDeleteInventory ? 'true' : 'false') . ";
+            var canManageAdmin = " . ($canManageAdmin ? 'true' : 'false') . ";
+            var canManageClerk = " . ($canManageClerk ? 'true' : 'false') . ";
             console.log('User ID:', userId);
-            console.log('Permissions:', { canViewInventory, canAddInventory , canEditInventory, canDeleteInventory});
+            console.log('Permissions:', { canViewInventory, canAddInventory , canEditInventory, canDeleteInventory, canManageAdmin, canManageClerk});
         </script>";
     } else {
         
@@ -160,7 +164,9 @@
                     canView: typeof canViewInventory !== 'undefined' ? canViewInventory : false,
                     canEdit: typeof canEditInventory !== 'undefined' ? canEditInventory : false,
                     canDelete: typeof canDeleteInventory !== 'undefined' ? canDeleteInventory : false,
-                    canAdd: typeof canAddInventory !== 'undefined' ? canAddInventory : false
+                    canAdd: typeof canAddInventory !== 'undefined' ? canAddInventory : false,
+                    canManageClerk: typeof canManageClerk !== 'undefined' ? canManageClerk : false,
+                    canManageAdmin: typeof canManageAdmin !== 'undefined' ? canManageAdmin : false
                 };
                 
                 // Initialize permission checks
@@ -175,11 +181,27 @@
                     return;
                 }
 
+                this.hideRestrictedMenuItems();
                 if (!this.permissions.canView) {
                     this.hideInventoryTable();
                 } else {
                     this.setupEventListeners();
                     this.applyPermissions();
+                }
+            }
+
+            hideRestrictedMenuItems() {
+                const userSettingsMenu = document.querySelector('li a[href="users.php"]');
+                const logsMenu = document.querySelector('li a[href="logs.html"]');
+                
+                // Hide "User Settings" if the user does not have manage:clerk or manage:admin permission
+                if (userSettingsMenu && !(this.permissions.canManageClerk || this.permissions.canManageAdmin)) {
+                    userSettingsMenu.parentElement.style.display = 'none';
+                }
+                
+                // Hide "Logs" if the user does not have manage:admin permission
+                if (logsMenu && !this.permissions.canManageAdmin) {
+                    logsMenu.parentElement.style.display = 'none';
                 }
             }
 
