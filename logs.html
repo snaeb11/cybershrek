@@ -6,6 +6,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cambay:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="lib/datatables/dataTables.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="css/logs.css">
     <title>Logs</title>
@@ -74,19 +77,115 @@
                             <td>John Doe</td>
                             <td>Logged in to the system</td>
                             <td>December 27, 2024</td>
-                            <td>08:45 AM</td>
+                            <td>08:15 AM</td>
                         </tr>
                         <tr>
                             <td>Jane Smith</td>
-                            <td>Updated profile information</td>
+                            <td>Edited profile information</td>
+                            <td>December 26, 2024</td>
+                            <td>10:30 AM</td>
+                        </tr>
+                        <tr>
+                            <td>Michael Brown</td>
+                            <td>Viewed resource "Digital Libraries"</td>
+                            <td>December 25, 2024</td>
+                            <td>01:45 PM</td>
+                        </tr>
+                        <tr>
+                            <td>Emily Davis</td>
+                            <td>Logged out</td>
+                            <td>December 27, 2024</td>
+                            <td>09:05 AM</td>
+                        </tr>
+                        <tr>
+                            <td>Chris Johnson</td>
+                            <td>Downloaded file "Thesis Guide.pdf"</td>
+                            <td>December 26, 2024</td>
+                            <td>03:20 PM</td>
+                        </tr>
+                        <tr>
+                            <td>Sarah Wilson</td>
+                            <td>Accessed "Programming Basics" course</td>
+                            <td>December 24, 2024</td>
+                            <td>11:10 AM</td>
+                        </tr>
+                        <tr>
+                            <td>Daniel Martinez</td>
+                            <td>Uploaded assignment for "Database Management"</td>
+                            <td>December 27, 2024</td>
+                            <td>07:45 AM</td>
+                        </tr>
+                        <tr>
+                            <td>Matthew Rodriguez</td>
+                            <td>Logged in to the system</td>
+                            <td>December 27, 2024</td>
+                            <td>08:00 AM</td>
+                        </tr>
+                        <tr>
+                            <td>Ashley Hernandez</td>
+                            <td>Viewed grades for "Mathematics 101"</td>
+                            <td>December 25, 2024</td>
+                            <td>05:15 PM</td>
+                        </tr>
+                        <tr>
+                            <td>Anthony Lopez</td>
+                            <td>Started quiz on "History of Arts"</td>
+                            <td>December 27, 2024</td>
+                            <td>10:50 AM</td>
+                        </tr>
+                        <tr>
+                            <td>Amanda Moore</td>
+                            <td>Updated password</td>
+                            <td>December 26, 2024</td>
+                            <td>09:25 AM</td>
+                        </tr>
+                        <tr>
+                            <td>David Clark</td>
+                            <td>Logged out</td>
+                            <td>December 27, 2024</td>
+                            <td>11:00 AM</td>
+                        </tr>
+                        <tr>
+                            <td>Megan Lewis</td>
+                            <td>Accessed resource "Machine Learning Basics"</td>
+                            <td>December 26, 2024</td>
+                            <td>04:40 PM</td>
+                        </tr>
+                        <tr>
+                            <td>Ryan Lee</td>
+                            <td>Viewed announcements</td>
+                            <td>December 25, 2024</td>
+                            <td>06:10 PM</td>
+                        </tr>
+                        <tr>
+                            <td>Kimberly Walker</td>
+                            <td>Submitted project proposal</td>
+                            <td>December 27, 2024</td>
+                            <td>12:15 PM</td>
+                        </tr>
+                        <tr>
+                            <td>Joshua Hall</td>
+                            <td>Downloaded resource "E-Library Guide"</td>
+                            <td>December 26, 2024</td>
+                            <td>01:50 PM</td>
+                        </tr>
+                        <tr>
+                            <td>Olivia Allen</td>
+                            <td>Started online lecture "Physics Fundamentals"</td>
                             <td>December 27, 2024</td>
                             <td>09:30 AM</td>
                         </tr>
                         <tr>
-                            <td>Michael Johnson</td>
-                            <td>Logged out from the system</td>
-                            <td>December 27, 2024</td>
-                            <td>10:15 AM</td>
+                            <td>Jacob Young</td>
+                            <td>Updated profile picture</td>
+                            <td>December 26, 2024</td>
+                            <td>11:45 AM</td>
+                        </tr>
+                        <tr>
+                            <td>Sophia King</td>
+                            <td>Uploaded essay for "Creative Writing"</td>
+                            <td>December 25, 2024</td>
+                            <td>08:20 PM</td>
                         </tr>
                     </tbody>
                 </table>
@@ -94,7 +193,13 @@
         </div>
     </main>
 
+    <script src="lib/jQuery/jquery-3.7.1.min.js"></script>
+    <script src="lib/datatables/dataTables.js"></script>
     <script defer>
+
+        $(document).ready( function () {
+            $('#myTable').DataTable();
+        } );
 
         //side bar
         const toggleButton = document.getElementById('toggle-btn');
