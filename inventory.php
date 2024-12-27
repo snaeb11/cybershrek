@@ -175,8 +175,12 @@
                     return;
                 }
 
-                this.setupEventListeners();
-                this.applyPermissions();
+                if (!this.permissions.canView) {
+                    this.hideInventoryTable();
+                } else {
+                    this.setupEventListeners();
+                    this.applyPermissions();
+                }
             }
 
             setupEventListeners() {
@@ -216,6 +220,16 @@
                 });
             }
 
+            hideInventoryTable() {
+                const tableContainer = document.querySelector('.tableContent');
+                const message = document.createElement('p');
+                message.textContent = "You have no permission to view the inventory";
+                message.style.textAlign = 'center';
+                message.style.fontSize = '20px';
+                tableContainer.innerHTML = '';
+                tableContainer.appendChild(message);
+            }
+
             checkPermission(action) {
                 switch (action) {
                     case 'add':
@@ -242,102 +256,106 @@
         document.addEventListener('DOMContentLoaded', function() {
             window.permissionHandler = new PermissionHandler();
             
-            // Add Item Button Handler
-            document.querySelector('.cssbuttons-io-button').addEventListener('click', () => {
-                if (!window.permissionHandler.checkPermission('add')) {
+            // Only add event listener if user has 'add' permission
+            const addItemButton = document.querySelector('.cssbuttons-io-button');
+            if (addItemButton && window.permissionHandler.checkPermission('add')) {
+                addItemButton.addEventListener('click', () => {
                     Swal.fire({
-                        title: 'Permission Denied',
-                        text: 'You do not have permission to add new items.',
-                        icon: 'error',
-                        confirmButtonText: 'OK'
-                    });
-                    return;
-                }
+                        title: 'Add New Item',
+                        html: `
+                            <input type="text" id="productName" class="swal2-input" placeholder="Product Name">
+                            <input type="text" id="category" class="swal2-input" placeholder="Category">
+                            <input type="number" id="qty" class="swal2-input" placeholder="Quantity">
+                            <input type="number" step="0.01" id="price" class="swal2-input" placeholder="Price">
+                        `,
+                        confirmButtonText: 'Submit',
+                        confirmButtonColor: '#9F6D45',
+                        showCancelButton: true,
+                        preConfirm: () => {
+                            const productName = sanitizeInput(document.getElementById('productName').value);
+                            const category = sanitizeInput(document.getElementById('category').value);
+                            const qty = sanitizeInput(document.getElementById('qty').value);
+                            const price = sanitizeInput(document.getElementById('price').value);
 
-                Swal.fire({
-                    title: 'Add New Item',
-                    html: `
-                        <input type="text" id="productName" class="swal2-input" placeholder="Product Name">
-                        <input type="text" id="category" class="swal2-input" placeholder="Category">
-                        <input type="number" id="qty" class="swal2-input" placeholder="Quantity">
-                        <input type="number" step="0.01" id="price" class="swal2-input" placeholder="Price">
-                    `,
-                    confirmButtonText: 'Submit',
-                    confirmButtonColor: '#9F6D45',
-                    showCancelButton: true,
-                    preConfirm: () => {
-                        const productName = sanitizeInput(document.getElementById('productName').value);
-                        const category = sanitizeInput(document.getElementById('category').value);
-                        const qty = sanitizeInput(document.getElementById('qty').value);
-                        const price = sanitizeInput(document.getElementById('price').value);
-
-                        if (!productName || !category || !qty || !price) {
-                            Swal.showValidationMessage('Please fill in all fields');
-                            return false;
-                        }
-
-                        return { productName, category, qty, price };
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const formData = new FormData();
-                        formData.append('productName', result.value.productName);
-                        formData.append('category', result.value.category);
-                        formData.append('qty', result.value.qty);
-                        formData.append('price', result.value.price);
-
-                        fetch('add_bread.php', {
-                            method: 'POST',
-                            body: formData
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire('Success', data.message, 'success');
-                                location.reload();
-                            } else {
-                                Swal.fire('Error', data.message, 'error');
+                            if (!productName || !category || !qty || !price) {
+                                Swal.showValidationMessage('Please fill in all fields');
+                                return false;
                             }
-                        })
-                        .catch(error => {
-                            Swal.fire('Error', 'Failed to add item.', 'error');
-                            console.error(error);
-                        });
-                    }
+
+                            return { productName, category, qty, price };
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const formData = new FormData();
+                            formData.append('productName', result.value.productName);
+                            formData.append('category', result.value.category);
+                            formData.append('qty', result.value.qty);
+                            formData.append('price', result.value.price);
+
+                            fetch('add_bread.php', {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire('Success', data.message, 'success');
+                                    location.reload();
+                                } else {
+                                    Swal.fire('Error', data.message, 'error');
+                                }
+                            })
+                            .catch(error => {
+                                Swal.fire('Error', 'Failed to add item.', 'error');
+                                console.error(error);
+                            });
+                        }
+                    });
                 });
-            });
+            }
         });
 
         // Initialize DataTable and Load Data
         $(document).ready(function() {
-            fetch('display_bread.php')
-                .then(response => response.json())
-                .then(data => {
-                    const tableBody = document.querySelector('#myTable tbody');
-                    data.forEach(product => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${product.productId}</td>
-                            <td>${product.productName}</td>
-                            <td>${product.category}</td>
-                            <td>${product.qty}</td>
-                            <td>${product.price}</td>
-                            <td>
-                                <button class="edit-btn" id="act-edit-btn" data-id="${product.productId}"><span>Edit</span></button>
-                                <button class="delete-btn" data-id="${product.productId}"><span>Delete</span></button>
-                            </td>
-                        `;
-                        tableBody.appendChild(row);
-                    });
+            // Only fetch data if the user has 'view' permission
+            if (canViewInventory) {
+                fetch('display_bread.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        const tableBody = document.querySelector('#myTable tbody');
+                        data.forEach(product => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${product.productId}</td>
+                                <td>${product.productName}</td>
+                                <td>${product.category}</td>
+                                <td>${product.qty}</td>
+                                <td>${product.price}</td>
+                                <td>
+                                    <button class="edit-btn" id="act-edit-btn" data-id="${product.productId}"><span>Edit</span></button>
+                                    <button class="delete-btn" data-id="${product.productId}"><span>Delete</span></button>
+                                </td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
 
-                    if (!$.fn.DataTable.isDataTable('#myTable')) {
-                        $('#myTable').DataTable();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    Swal.fire('Error', 'Failed to fetch data', 'error');
-                });
+                        if (!$.fn.DataTable.isDataTable('#myTable')) {
+                            $('#myTable').DataTable();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching inventory data:', error);
+                    });
+            } else {
+                // Optionally show a message if the user does not have permission to view
+                const tableContainer = document.querySelector('.tableContent');
+                const message = document.createElement('p');
+                message.textContent = "You do not have permission to view the inventory.";
+                message.style.textAlign = 'center';
+                message.style.fontSize = '20px';
+                tableContainer.innerHTML = '';
+                tableContainer.appendChild(message);
+            }
         });
 
         // Edit Button Handler
