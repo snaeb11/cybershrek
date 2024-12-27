@@ -36,10 +36,10 @@ function encryptPassword($password) {
 }
 
 // Define the function to create a new account
-function createAccount($firstName, $lastName, $pass, $email, $permission = "inventory:view") {  // Default permission set to inventory:view (clerk)
+function createAccount($firstName, $lastName, $pass, $email, $permission = "inventory:view") {
     global $conn;
 
-    // Encrypt the password securely using Dcrypt
+    // Encrypt the password securely
     $passwordHash = encryptPassword($pass);
 
     // Insert the new account into the database
@@ -50,13 +50,32 @@ function createAccount($firstName, $lastName, $pass, $email, $permission = "inve
 
     // Check if the account was created successfully
     if ($result) {
-        echo "Account created successfully!";
+        // SweetAlert for success
+        echo "
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Account Created',
+                    text: 'The account has been successfully created!'
+                });
+            </script>
+        ";
         return true;
     } else {
-        echo "Error creating account: " . $stmt->error;
+        // SweetAlert for error
+        echo "
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'There was an error creating the account: " . addslashes($stmt->error) . "'
+                });
+            </script>
+        ";
         return false;
     }
 }
+
 
 // Check if the form has been submitted
 if (isset($_POST['submit'])) {
@@ -71,20 +90,54 @@ if (isset($_POST['submit'])) {
 
     // Validate the form data
     if (empty($firstName) || empty($lastName) || empty($pass) || empty($email)) {
-        echo "<script>alert('Please fill out all fields.');</script>";
+        echo "
+            <script>
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Oops...',
+                    text: 'Please fill out all fields.'
+                });
+            </script>
+        ";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        echo "<script>alert('Invalid email address.');</script>";
+        echo "
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Email',
+                    text: 'Please enter a valid email address.'
+                });
+            </script>
+        ";
     } else {
         // Create the new account
         if (createAccount($firstName, $lastName, $pass, $email, $permission)) {
-            echo "<script>alert('Successfully created an account.');</script>";
-            // Redirect to the index/login screen
-            echo "<script>window.location.href = 'index.html';</script>";
+            echo "
+                <script>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Account Created',
+                        text: 'Successfully created an account.',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = 'index.html';
+                    });
+                </script>
+            ";
             exit;
         } else {
-            echo "<script>alert('Error creating account.');</script>";
+            echo "
+                <script>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'There was an error creating the account. Please try again.'
+                    });
+                </script>
+            ";
         }
     }
+    
 }
 
 // Close the database connection
