@@ -1,6 +1,10 @@
 <?php
-
+require 'config/db_connection.php';
 require_once __DIR__ . '/vendor/autoload.php';
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 // Load environment variables from .env file
 $envFile = '.env';
@@ -12,15 +16,14 @@ foreach ($envContents as $line) {
     $envVariables[$key] = trim($value);
 }
 
-// Include the database connection configuration file
-$conn = require_once 'config/db_connection.php';
-
 // Get the value of the ENCRYPTION_KEY environment variable
-$key = $envVariables['ENCRYPTION_KEY'];
+$key = $envVariables['ENCRYPTION_KEY'] ?? null;
 
 // Ensure the key is set in the environment
 if (!$key) {
-    die('Encryption key is not set in the .env file.');
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Encryption key is not set in the .env file.']);
+    exit;
 }
 
 // Sanitize user input
@@ -35,92 +38,37 @@ function encryptPassword($password) {
     return base64_encode($encryptedData);
 }
 
-// Define the function to create a new account
-function createAccount($firstName, $lastName, $pass, $email, $permission = "inventory:view") {  // Default permission set to inventory:view (clerk)
-    global $conn;
+// Handle JSON input
+$input = json_decode(file_get_contents('php://input'), true);
 
-    // Encrypt the password securely using Dcrypt
-    $passwordHash = encryptPassword($pass);
-
-    // Insert the new account into the database
-    $query = "INSERT INTO accounts (firstName, lastName, pass, email, permission) VALUES (?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("sssss", $firstName, $lastName, $passwordHash, $email, $permission);
-    $result = $stmt->execute();
-
-    // Check if the account was created successfully
-    if ($result) {
-        echo "Account created successfully!";
-        return true;
-    } else {
-        echo "Error creating account: " . $stmt->error;
-        return false;
-    }
+if (!$input) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Invalid JSON input.']);
+    exit;
 }
 
-// Check if the form has been submitted
-if (isset($_POST['submit'])) {
-    // Get the form data
-    $firstName = sanitizeInput($_POST['firstName']);
-    $lastName = sanitizeInput($_POST['lastName']);
-    $pass = sanitizeInput($_POST['pass']);
-    $email = sanitizeInput($_POST['email']);
-    
-    // Set the roleId field to "Clerk" (default value 3)
-    $permission = "inventory:view"; // Clerk role by default
+// Extract and sanitize input data
+$firstName = sanitizeInput($input['firstName'] ?? '');
+$lastName = sanitizeInput($input['lastName'] ?? '');
+$pass = sanitizeInput($input['pass'] ?? '');
+$email = sanitizeInput($input['email'] ?? '');
+$permission = "inventory:view"; 
 
-    // Validate the form data
-    if (empty($firstName) || empty($lastName) || empty($pass) || empty($email)) {
-        echo "
-            <script>
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Oops...',
-                    text: 'Please fill out all fields.'
-                });
-            </script>
-        ";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        echo "
-            <script>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Email',
-                    text: 'Please enter a valid email address.'
-                });
-            </script>
-        ";
-    } else {
-        // Create the new account
-        if (createAccount($firstName, $lastName, $pass, $email, $permission)) {
-            echo "
-                <script>
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Account Created',
-                        text: 'Successfully created an account.',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        window.location.href = 'index.html';
-                    });
-                </script>
-            ";
-            exit;
-        } else {
-            echo "
-                <script>
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'There was an error creating the account. Please try again.'
-                    });
-                </script>
-            ";
-        }
-    }
-    
+// Encrypt the password
+$passwordHash = encryptPassword($pass);
+
+// Insert the new account into the database
+$query = "INSERT INTO accounts (firstName, lastName, pass, email, permission) VALUES (?, ?, ?, ?, ?)";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("sssss", $firstName, $lastName, $passwordHash, $email, $permission);
+
+if ($stmt->execute()) {
+    echo json_encode(['success' => true, 'message' => 'Account created successfully.']);
+} else {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Error creating account: ' . $stmt->error]);
 }
 
-// Close the database connection
+// Close the statement and connection
+$stmt->close();
 $conn->close();
-?>

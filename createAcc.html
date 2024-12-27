@@ -25,7 +25,7 @@
       </div>
 
       <div class="formContainer">
-        <form action="createAccount.php" class="form" id="login" method="POST">
+        <form class="form" id="createAccountForm">
           <input
             type="text"
             class="input"
@@ -69,6 +69,7 @@
           <input
             type="password"
             class="input"
+            id="confirmPassword"
             name="confirmPass"
             placeholder="Confirm Password"
             autocomplete="off"
@@ -76,15 +77,77 @@
           />
           <br />
           <a href="index.html" id="skill-issu">Already have an account?</a>
-          <input
-            type="submit"
-            class="inputButton"
-            id="submit"
-            name="submit"
-            value="create account"
-          />
+          <button type="submit" class="inputButton" id="submit">
+            Create Account
+          </button>
         </form>
       </div>
     </div>
+
+    <script defer>
+      document.addEventListener("DOMContentLoaded", function () {
+        const createAccountForm = document.getElementById("createAccountForm");
+
+        createAccountForm.addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const firstName = document.getElementById("firstName").value.trim();
+          const lastName = document.getElementById("lastName").value.trim();
+          const email = document.getElementById("emailInput").value.trim();
+          const password = document
+            .getElementById("passwordInput")
+            .value.trim();
+          const confirmPassword = document
+            .getElementById("confirmPassword")
+            .value.trim();
+
+          if (password !== confirmPassword) {
+            Swal.fire({
+              icon: "error",
+              title: "Password Mismatch",
+              text: "Passwords do not match.",
+            });
+            return;
+          }
+
+          const payload = { firstName, lastName, email, pass: password };
+
+          try {
+            const response = await fetch("createAccount.php", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(payload),
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+              Swal.fire({
+                icon: "success",
+                title: "Account Created",
+                text: "Successfully created an account.",
+              }).then(() => {
+                window.location.href = "index.html";
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text:
+                  result.message || "There was an error creating the account.",
+              });
+            }
+          } catch (error) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Failed to connect to the server.",
+            });
+          }
+        });
+      });
+    </script>
   </body>
 </html>
