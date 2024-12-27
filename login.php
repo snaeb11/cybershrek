@@ -58,15 +58,20 @@ function authenticateUser($email, $password) {
             // Start a session and store user data, including permissions
             session_start();
             $_SESSION['user'] = [
-                'id' => $user['userId'],
+                'userId' => $user['userId'],
                 'firstName' => $user['firstName'],
                 'lastName' => $user['lastName'],
                 'email' => $user['email'],
                 'permissions' => explode(',', $user['permission'])
             ];
-
-            return ['success' => true, 'message' => 'Login successful!', 'user' => $_SESSION['user']];
-        }
+        
+            // Return response with userId directly
+            return [
+                'success' => true, 
+                'message' => 'Login successful!', 
+                'userId' => $_SESSION['user']['userId']  // Add userId here
+            ];
+        }        
     }
 
     // If no match is found or passwords don't match

@@ -1,3 +1,52 @@
+<?php
+    session_start();
+    require_once 'config/db_connection.php';
+
+    function fetchUserPermissions($userId) {
+        global $conn;
+        
+        $stmt = $conn->prepare("SELECT permission FROM accounts WHERE userId = ?");
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            $user = $result->fetch_assoc();
+            return explode(', ', $user['permission']); 
+        }
+        
+        return []; 
+    }
+
+    // Check if the user is logged in
+    if (isset($_SESSION['user']['userId'])) {
+
+        $userId = $_SESSION['user']['userId'];
+        
+        $permissions = fetchUserPermissions($userId);
+        
+        $canViewInventory = in_array('inventory:view', $permissions);
+        $canEditInventory = in_array('inventory:edit', $permissions);
+        $canDeleteInventory = in_array('inventory:delete', $permissions);
+        $canAddInventory = in_array('inventory:add', $permissions);
+
+        echo "<script>
+            var userId = " . json_encode($userId) . ";
+            var canViewInventory = " . ($canViewInventory ? 'true' : 'false') . ";
+            var canEditInventory = " . ($canEditInventory ? 'true' : 'false') . ";
+            var canDeleteInventory = " . ($canDeleteInventory ? 'true' : 'false') . ";
+            var canAddInventory = " . ($canAddInventory ? 'true' : 'false') . ";
+            console.log('User ID:', userId);
+            console.log('Permissions:', { canViewInventory, canEditInventory, canDeleteInventory, canAddInventory });
+        </script>";
+    } else {
+        
+        echo "<script>
+            console.log('User is not logged in');
+        </script>";
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -76,7 +125,7 @@
                         <!--dynamically generated from database -->
                     </tbody>
                 </table>
-                <button class="cssbuttons-io-button">
+                <button class="cssbuttons-io-button"  id="addItemButton">
                     Add Item
                     <div class="icon">
                         <svg
@@ -103,17 +152,6 @@
     <script src="lib/datatables/dataTables.js"></script>
 
     <script defer>
-
-        document.addEventListener("DOMContentLoaded", function() {
-        const adminType = new URLSearchParams(window.location.search).get('adminType');
-        if (adminType) {
-            const adminTypeElement = document.querySelector('.adminType');
-            if (adminTypeElement) {
-            adminTypeElement.textContent = adminType;
-            }
-        }
-        });
-
         //sanitation function
         function sanitizeInput(input) {
             input = input.replace(/<\/?[^>]+(>|$)/g, "");
@@ -123,60 +161,78 @@
         }
 
         //add
-        document.querySelector('.cssbuttons-io-button').addEventListener('click', () => {
-            Swal.fire({
-                title: 'Add New Item',
-                html: `
-                    <input type="text" id="productName" class="swal2-input" placeholder="Product Name">
-                    <input type="text" id="category" class="swal2-input" placeholder="Category">
-                    <input type="number" id="qty" class="swal2-input" placeholder="Quantity">
-                    <input type="number" step="0.01" id="price" class="swal2-input" placeholder="Price">
-                `,
-                confirmButtonText: 'Submit',
-                confirmButtonColor: '#9F6D45',
-                showCancelButton: true,
-                preConfirm: () => {
-                    const productName = sanitizeInput(document.getElementById('productName').value);
-                    const category = sanitizeInput(document.getElementById('category').value);
-                    const qty = sanitizeInput(document.getElementById('qty').value);
-                    const price = sanitizeInput(document.getElementById('price').value);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if the user has permission to add items
+            if (!canAddInventory) {
+                document.getElementById('addItemButton').style.display = 'none';
+            }
 
-                    if (!productName || !category || !qty || !price) {
-                        Swal.showValidationMessage('Please fill in all fields');
-                        return false;
-                    }
-
-                    return { productName, category, qty, price };
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const formData = new FormData();
-                    formData.append('productName', result.value.productName);
-                    formData.append('category', result.value.category);
-                    formData.append('qty', result.value.qty);
-                    formData.append('price', result.value.price);
-
-                    fetch('add_bread.php', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire('Success', data.message, 'success');
-
-                            location.reload();
-                        } else {
-                            Swal.fire('Error', data.message, 'error');
-                        }
-                    })
-                    .catch(error => {
-                        Swal.fire('Error', 'Failed to add item.', 'error');
-                        console.error(error);
+            // Add button action
+            document.querySelector('.cssbuttons-io-button').addEventListener('click', () => {
+                if (!canAddInventory) {
+                    Swal.fire({
+                        title: 'Permission Denied',
+                        text: 'You do not have permission to add new items.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
                     });
+                    return;  // Prevent further action if permission is denied
                 }
+
+                Swal.fire({
+                    title: 'Add New Item',
+                    html: `
+                        <input type="text" id="productName" class="swal2-input" placeholder="Product Name">
+                        <input type="text" id="category" class="swal2-input" placeholder="Category">
+                        <input type="number" id="qty" class="swal2-input" placeholder="Quantity">
+                        <input type="number" step="0.01" id="price" class="swal2-input" placeholder="Price">
+                    `,
+                    confirmButtonText: 'Submit',
+                    confirmButtonColor: '#9F6D45',
+                    showCancelButton: true,
+                    preConfirm: () => {
+                        const productName = sanitizeInput(document.getElementById('productName').value);
+                        const category = sanitizeInput(document.getElementById('category').value);
+                        const qty = sanitizeInput(document.getElementById('qty').value);
+                        const price = sanitizeInput(document.getElementById('price').value);
+
+                        if (!productName || !category || !qty || !price) {
+                            Swal.showValidationMessage('Please fill in all fields');
+                            return false;
+                        }
+
+                        return { productName, category, qty, price };
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const formData = new FormData();
+                        formData.append('productName', result.value.productName);
+                        formData.append('category', result.value.category);
+                        formData.append('qty', result.value.qty);
+                        formData.append('price', result.value.price);
+
+                        fetch('add_bread.php', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Success', data.message, 'success');
+                                location.reload();
+                            } else {
+                                Swal.fire('Error', data.message, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire('Error', 'Failed to add item.', 'error');
+                            console.error(error);
+                        });
+                    }
+                });
             });
         });
+
 
 
         // tabke she

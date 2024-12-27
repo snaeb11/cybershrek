@@ -52,11 +52,14 @@
 
     <script defer>
       document.addEventListener("DOMContentLoaded", function () {
+        console.log("DOMContentLoaded triggered");
+        console.log("DOMContentLoaded triggered");
         const loginForm = document.getElementById("login");
         const emailInput = document.getElementById("emailInput");
         const passwordInput = document.getElementById("passwordInput");
 
-        //sanitation
+        // Sanitation function
+        // Sanitation function
         function sanitizeInput(input) {
           input = input.replace(/<\/?[^>]+(>|$)/g, "");
           const temp = document.createElement("div");
@@ -78,12 +81,14 @@
           })
             .then((response) => response.text())
             .then((text) => {
-              console.log("Raw response text:", text);
-              try {
-                const data = JSON.parse(text);
-                console.log("Received data from login.php:", data);
-                if (data.success) {
-                  let timerInterval;
+                console.log("Raw response text:", text); // Log the raw response
+                try {
+                    const data = JSON.parse(text); // Parse the response
+                    console.log("Parsed response:", data); // Log the parsed data
+
+                    if (data.success) {
+                        console.log("userId: ", data.userId);  // Access userId directly
+                        let timerInterval;
                   Swal.fire({
                     title: "Login Successful!",
                     html: "Redirecting in <b></b> milliseconds.",
@@ -103,40 +108,36 @@
                     /* Read more about handling dismissals below */
                     if (result.dismiss === Swal.DismissReason.timer) {
                       console.log("I was closed by the timer");
-                      loginRedirect("inventory.html", "Admin");
-                    }
+                            loginRedirect("inventory.php", data.userId);
+                        }
                   });
                 } else {
-                  Swal.fire({
+                        Swal.fire({
                   icon: "error",
                   title: "Oops...",
                   text: "Login failed: " + data.message
                 });
-                  passwordInput.value = "";
+                        passwordInput.value = "";
+                    }
+                } catch (e) {
+                    console.error("Error parsing JSON:", e);
+                        Swal.fire({
+                      icon: "error",
+                      title: "Oops...",
+                      text: "An error occurred while processing the login response."
+                    });
                 }
-              } catch (e) {
-                console.error("Error parsing JSON:", e);
-                Swal.fire({
-                  icon: "error",
-                  title: "Oops...",
-                  text: "An error occurred while processing the login response."
-                });
-              }
             })
             .catch((error) => {
-              console.error("Error:", error);
-              Swal.fire({
-                  icon: "error",
-                  title: "Oops...",
-                  text: "Something went wrong. Please try again."
-                });
+                console.error("Error:", error);
+                alert("Something went wrong. Please try again.");
             });
         });
-      });
 
-      function loginRedirect(url, adminType) {
-        window.location.href = `${url}?adminType=${adminType}`;
-      }
+      function loginRedirect(url, userId) {
+          window.location.href = `${url}?userId=${userId}`;
+        }
+      });
 
       function loadConfigFile() {
         fetch("config/config.php", {
