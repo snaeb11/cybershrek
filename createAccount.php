@@ -36,10 +36,10 @@ function encryptPassword($password) {
 }
 
 // Define the function to create a new account
-function createAccount($firstName, $lastName, $pass, $email, $permission = "inventory:view") {
+function createAccount($firstName, $lastName, $pass, $email, $permission = "inventory:view") {  // Default permission set to inventory:view (clerk)
     global $conn;
 
-    // Encrypt the password securely
+    // Encrypt the password securely using Dcrypt
     $passwordHash = encryptPassword($pass);
 
     // Insert the new account into the database
@@ -50,32 +50,13 @@ function createAccount($firstName, $lastName, $pass, $email, $permission = "inve
 
     // Check if the account was created successfully
     if ($result) {
-        // SweetAlert for success
-        echo "
-            <script>
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Account Created',
-                    text: 'The account has been successfully created!'
-                });
-            </script>
-        ";
+        echo "Account created successfully!";
         return true;
     } else {
-        // SweetAlert for error
-        echo "
-            <script>
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'There was an error creating the account: " . addslashes($stmt->error) . "'
-                });
-            </script>
-        ";
+        echo "Error creating account: " . $stmt->error;
         return false;
     }
 }
-
 
 // Check if the form has been submitted
 if (isset($_POST['submit'])) {

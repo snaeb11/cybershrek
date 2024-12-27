@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cambay:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="css/logs.css">
+    <title>Logs</title>
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <ul>
+            <li>
+                <!--jais.-->
+                <span class="logo">
+                    <img src="resources/small-Vector.svg" alt="jais. logo" id="jais-logo" width="65" height="65">
+                </span>
+                <button onclick=toggleSidebar() id="toggle-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="m313-480 155 156q11 11 11.5 27.5T468-268q-11 11-28 11t-28-11L228-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T468-692q11 11 11 28t-11 28L313-480Zm264 0 155 156q11 11 11.5 27.5T732-268q-11 11-28 11t-28-11L492-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T732-692q11 11 11 28t-11 28L577-480Z"/></svg>
+                </button>
+            </li>
+            <li>
+                <!--INVENTORY-->
+                <a href="inventory.php">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M200-80q-33 0-56.5-23.5T120-160v-451q-18-11-29-28.5T80-680v-120q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v120q0 23-11 40.5T840-611v451q0 33-23.5 56.5T760-80H200Zm0-520v440h560v-440H200Zm-40-80h640v-120H160v120Zm200 280h240v-80H360v80Zm120 20Z"/></svg>
+                    <span>Inventory</span>
+                </a>
+            </li>
+            <li>
+                <!--USER SETTING-->
+                <a href="users.php">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg>
+                    <span>User Settings</span>
+                </a>
+            </li>
+            <li class="active">
+                <!--LOGS-->
+                <a href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M760-200v-120H200v120h560Zm0-200v-160H200v160h560Zm0-240v-120H200v120h560ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z"/></svg>
+                    <span>Logs</span>
+                </a>
+            </li>
+            <li>
+                <!--LOGOUT-->
+                <a href="javascript:void(0)" onclick="logout()" id="logout-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="title">
+            <p class="text" id="logsTitle">Logs</p>
+        </div>
+
+        <div class="wrapper">
+            <div class="tableContent">
+                <table id="myTable" class="display">
+                    <thead>
+                        <tr>
+                            <th>User Name</th>
+                            <th>Activity Log</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>John Doe</td>
+                            <td>Logged in to the system</td>
+                            <td>December 27, 2024</td>
+                            <td>08:45 AM</td>
+                        </tr>
+                        <tr>
+                            <td>Jane Smith</td>
+                            <td>Updated profile information</td>
+                            <td>December 27, 2024</td>
+                            <td>09:30 AM</td>
+                        </tr>
+                        <tr>
+                            <td>Michael Johnson</td>
+                            <td>Logged out from the system</td>
+                            <td>December 27, 2024</td>
+                            <td>10:15 AM</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script defer>
+
+        //side bar
+        const toggleButton = document.getElementById('toggle-btn');
+        const sidebar = document.getElementById('sidebar');
+
+        function toggleSidebar(){
+            navbar.classList.toggle('close');
+            toggleButton.classList.toggle('rotate');
+        }
+        //side bar
+
+        //logout
+        const logoutButton = document.getElementById('logout-btn');
+        function logout() {
+            Swal.fire({
+                title: 'Logout',
+                text: 'Are you sure you want to logout?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#9F6D45',
+                confirmButtonText: 'Logout',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'index.html';
+                }
+            });
+        }
+        //logout
+    </script>
+</body>
+</html>

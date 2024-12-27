@@ -1,0 +1,180 @@
+:root{
+    --base-clr: #11121a;
+    --line-clr: #42434a;
+    --hover-clr: #7e410f;
+    --text-clr: #e6e6ef;
+    --accent-clr: #eea970;
+    --secondary-text-clr: #b0b3c1;
+  }
+
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    margin: 0;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    font-family: 'Cambay', sans-serif;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url(../resources/breadPat.jpg);
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    background-position: center;
+    opacity: 0.3;
+    z-index: -1;
+}
+
+.navbar{
+    box-sizing: border-box;
+    height: 100vh;
+    width: 250px;
+    padding: 5px 1em;
+    background-color: #9F6D45;
+
+    position: sticky;
+    top: 0;
+    align-self: start;
+    transition: 300ms ease-in-out;
+    overflow: hidden;
+    text-wrap: nowrap;
+}
+
+#navbar.close{
+    padding: 5px;
+    width: 60px;
+}
+
+.rotate svg:last-child{
+    rotate: 180deg;
+}
+
+#toggle-btn{
+    margin-left: auto;
+    padding: 1em;
+    border: none;
+    border-radius: .5em;
+    background: none;
+    cursor: pointer;
+  
+    svg{
+      transition: rotate 150ms ease;
+    }
+}
+
+  #toggle-btn:hover{
+    background-color: var(--hover-clr);
+}
+
+
+#navbar ul{
+    list-style: none;
+}
+
+#navbar > ul > li:first-child{
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+    .logo{
+      font-weight: 600;
+    }
+}
+
+#navbar ul li.active a{
+    color: var(--accent-clr);
+
+  svg{
+    fill: var(--accent-clr);
+  }
+}
+
+#navbar a, #navbar .logo{
+    border-radius: .5em;
+    padding: .85em;
+    text-decoration: none;
+    color: var(--text-clr);
+    display: flex;
+    align-items: center;
+    gap: 1em;
+}
+
+#navbar svg{
+    flex-shrink: 0;
+    fill: var(--text-clr);
+}
+
+#navbar a span{
+    flex-grow: 1;
+}
+
+#navbar a:hover{
+    background-color: var(--hover-clr);
+}
+
+#navbar #jais-logo:hover{
+    background-color: #9F6D45;
+    cursor: default;
+}
+
+#myTable{
+    padding: 2%;
+}
+
+
+#logsTitle{
+    font-size: 70px;
+    font-weight: 1000;
+    color: #9F6D45;
+    padding-left: 1%;
+}
+
+.tableContent {
+    background-color: #f9f9f9;
+    padding: 45px;
+    box-shadow: 4px 14px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    width: 85%;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #9F6D45;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #e6e6e6;
+}
+
+.wrapper{
+    display: flex;
+    justify-content: center;
+}
