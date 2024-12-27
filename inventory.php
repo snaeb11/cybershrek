@@ -26,18 +26,18 @@
         $permissions = fetchUserPermissions($userId);
         
         $canViewInventory = in_array('inventory:view', $permissions);
+        $canAddInventory = in_array('inventory:add', $permissions);
         $canEditInventory = in_array('inventory:edit', $permissions);
         $canDeleteInventory = in_array('inventory:delete', $permissions);
-        $canAddInventory = in_array('inventory:add', $permissions);
 
         echo "<script>
             var userId = " . json_encode($userId) . ";
             var canViewInventory = " . ($canViewInventory ? 'true' : 'false') . ";
+            var canAddInventory = " . ($canAddInventory ? 'true' : 'false') . ";
             var canEditInventory = " . ($canEditInventory ? 'true' : 'false') . ";
             var canDeleteInventory = " . ($canDeleteInventory ? 'true' : 'false') . ";
-            var canAddInventory = " . ($canAddInventory ? 'true' : 'false') . ";
             console.log('User ID:', userId);
-            console.log('Permissions:', { canViewInventory, canEditInventory, canDeleteInventory, canAddInventory });
+            console.log('Permissions:', { canViewInventory, canAddInventory , canEditInventory, canDeleteInventory});
         </script>";
     } else {
         
@@ -152,7 +152,85 @@
     <script src="lib/datatables/dataTables.js"></script>
 
     <script defer>
-        //sanitation function
+        // Permission handler utility
+        class PermissionHandler {
+            constructor() {
+                // Store permissions from PHP session
+                this.permissions = {
+                    canView: typeof canViewInventory !== 'undefined' ? canViewInventory : false,
+                    canEdit: typeof canEditInventory !== 'undefined' ? canEditInventory : false,
+                    canDelete: typeof canDeleteInventory !== 'undefined' ? canDeleteInventory : false,
+                    canAdd: typeof canAddInventory !== 'undefined' ? canAddInventory : false
+                };
+                
+                // Initialize permission checks
+                this.init();
+            }
+
+            init() {
+                // Check if user is logged in
+                if (typeof userId === 'undefined') {
+                    console.log('User not logged in, redirecting...');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                this.setupEventListeners();
+                this.applyPermissions();
+            }
+
+            setupEventListeners() {
+                // Watch for dynamic table changes
+                const tableBody = document.querySelector('#myTable tbody');
+                if (tableBody) {
+                    const observer = new MutationObserver(() => this.applyPermissions());
+                    observer.observe(tableBody, { 
+                        childList: true, 
+                        subtree: true 
+                    });
+                }
+            }
+
+            applyPermissions() {
+                // Handle Add button
+                const addButton = document.getElementById('addItemButton');
+                if (addButton) {
+                    addButton.style.display = this.permissions.canAdd ? 'flex' : 'none';
+                }
+
+                // Handle Edit and Delete buttons
+                const rows = document.querySelectorAll('#myTable tbody tr');
+                rows.forEach(row => {
+                    const actionCell = row.querySelector('td:last-child');
+                    if (actionCell) {
+                        const editButton = actionCell.querySelector('.edit-btn');
+                        const deleteButton = actionCell.querySelector('.delete-btn');
+
+                        if (editButton) {
+                            editButton.style.display = this.permissions.canEdit ? 'inline-block' : 'none';
+                        }
+                        if (deleteButton) {
+                            deleteButton.style.display = this.permissions.canDelete ? 'inline-block' : 'none';
+                        }
+                    }
+                });
+            }
+
+            checkPermission(action) {
+                switch (action) {
+                    case 'add':
+                        return this.permissions.canAdd;
+                    case 'edit':
+                        return this.permissions.canEdit;
+                    case 'delete':
+                        return this.permissions.canDelete;
+                    default:
+                        return false;
+                }
+            }
+        }
+
+        // Utility Functions
         function sanitizeInput(input) {
             input = input.replace(/<\/?[^>]+(>|$)/g, "");
             const temp = document.createElement('div');
@@ -160,23 +238,20 @@
             return temp.innerHTML;
         }
 
-        //add
+        // Initialize permission handler when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if the user has permission to add items
-            if (!canAddInventory) {
-                document.getElementById('addItemButton').style.display = 'none';
-            }
-
-            // Add button action
+            window.permissionHandler = new PermissionHandler();
+            
+            // Add Item Button Handler
             document.querySelector('.cssbuttons-io-button').addEventListener('click', () => {
-                if (!canAddInventory) {
+                if (!window.permissionHandler.checkPermission('add')) {
                     Swal.fire({
                         title: 'Permission Denied',
                         text: 'You do not have permission to add new items.',
                         icon: 'error',
                         confirmButtonText: 'OK'
                     });
-                    return;  // Prevent further action if permission is denied
+                    return;
                 }
 
                 Swal.fire({
@@ -233,9 +308,7 @@
             });
         });
 
-
-
-        // tabke she
+        // Initialize DataTable and Load Data
         $(document).ready(function() {
             fetch('display_bread.php')
                 .then(response => response.json())
@@ -250,7 +323,7 @@
                             <td>${product.qty}</td>
                             <td>${product.price}</td>
                             <td>
-                                <button class="edit-btn" id="action-btn" data-id="${product.productId}"><span>Edit</span></button>
+                                <button class="edit-btn" id="act-edit-btn" data-id="${product.productId}"><span>Edit</span></button>
                                 <button class="delete-btn" data-id="${product.productId}"><span>Delete</span></button>
                             </td>
                         `;
@@ -263,29 +336,45 @@
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
-                    alert('Error fetching data');
+                    Swal.fire('Error', 'Failed to fetch data', 'error');
                 });
         });
 
-        //ebit
+        // Edit Button Handler
         $(document).on('click', '.edit-btn', function() {
+            if (!window.permissionHandler.checkPermission('edit')) {
+                Swal.fire({
+                    title: 'Permission Denied',
+                    text: 'You do not have permission to edit items.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
             const productId = $(this).data('id');
+            const row = $(this).closest('tr');
+            const productName = row.find('td:eq(1)').text();
+            const category = row.find('td:eq(2)').text();
+            const qty = row.find('td:eq(3)').text();
+            const price = row.find('td:eq(4)').text();
+            
             Swal.fire({
                 title: 'Edit Product',
                 html: `
-                    <input type="text" id="editProductName" class="swal2-input" placeholder="Product Name">
-                    <input type="text" id="editCategory" class="swal2-input" placeholder="Category">
-                    <input type="number" id="editQty" class="swal2-input" placeholder="Quantity">
-                    <input type="number" step="0.01" id="editPrice" class="swal2-input" placeholder="Price">
+                    <input type="text" id="editProductName" class="swal2-input" placeholder="Product Name" value="${productName}">
+                    <input type="text" id="editCategory" class="swal2-input" placeholder="Category" value="${category}">
+                    <input type="number" id="editQty" class="swal2-input" placeholder="Quantity" value="${qty}">
+                    <input type="number" step="0.01" id="editPrice" class="swal2-input" placeholder="Price" value="${price}">
                 `,
                 confirmButtonText: 'Update',
                 confirmButtonColor: '#9F6D45',
                 showCancelButton: true,
                 preConfirm: () => {
-                    const productName = sanitizeInput(document.getElementById('productName').value);
-                    const category = sanitizeInput(document.getElementById('category').value);
-                    const qty = sanitizeInput(document.getElementById('qty').value);
-                    const price = sanitizeInput(document.getElementById('price').value);
+                    const productName = sanitizeInput(document.getElementById('editProductName').value);
+                    const category = sanitizeInput(document.getElementById('editCategory').value);
+                    const qty = sanitizeInput(document.getElementById('editQty').value);
+                    const price = sanitizeInput(document.getElementById('editPrice').value);
 
                     if (!productName || !category || !qty || !price) {
                         Swal.showValidationMessage('Please fill in all fields');
@@ -296,16 +385,48 @@
                 }
             }).then(result => {
                 if (result.isConfirmed) {
-                    const { productId, productName, category, qty, price } = result.value;
-                    //lujik 'ere
-                    Swal.fire('Updated!', `Product ID: ${productId} updated successfully.`, 'success');
+                    const formData = new FormData();
+                    formData.append('productId', result.value.productId);
+                    formData.append('productName', result.value.productName);
+                    formData.append('category', result.value.category);
+                    formData.append('qty', result.value.qty);
+                    formData.append('price', result.value.price);
+
+                    fetch('update_bread.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Success', 'Product updated successfully.', 'success');
+                            location.reload();
+                        } else {
+                            Swal.fire('Error', data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', 'Failed to update item.', 'error');
+                        console.error(error);
+                    });
                 }
             });
         });
 
-        //delemts
+        // Delete Button Handler
         $(document).on('click', '.delete-btn', function() {
+            if (!window.permissionHandler.checkPermission('delete')) {
+                Swal.fire({
+                    title: 'Permission Denied',
+                    text: 'You do not have permission to delete items.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
             const productId = $(this).data('id');
+
             Swal.fire({
                 title: 'Are you sure?',
                 text: `You are about to delete product ID: ${productId}. This action cannot be undone.`,
@@ -315,33 +436,41 @@
                 cancelButtonText: 'Cancel',
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#9F6D45'
-            }).then(result => {
+            }).then((result) => {
                 if (result.isConfirmed) {
-                    //lujik 'ere
-                    Swal.fire({
-                        title: 'Deleted!',
-                        text: `Product ID: ${productId} has been deleted.`,
-                        icon: 'success',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#9F6D45'
+                    const formData = new FormData();
+                    formData.append('productId', productId);
+
+                    fetch('delete_bread.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Deleted!', 'The product has been deleted successfully.', 'success')
+                                .then(() => location.reload());
+                        } else {
+                            throw new Error(data.message || 'Failed to delete product.');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', error.message, 'error');
+                        console.error(error);
                     });
                 }
             });
         });
 
-
-        //side bar
-        const toggleButton = document.getElementById('toggle-btn');
-        const sidebar = document.getElementById('sidebar');
-
-        function toggleSidebar(){
+        // Sidebar Toggle
+        function toggleSidebar() {
+            const navbar = document.getElementById('navbar');
+            const toggleButton = document.getElementById('toggle-btn');
             navbar.classList.toggle('close');
             toggleButton.classList.toggle('rotate');
         }
-        //side bar
 
-        //logout
-        const logoutButton = document.getElementById('logout-btn');
+        // Logout Function
         function logout() {
             Swal.fire({
                 title: 'Logout',
@@ -358,7 +487,6 @@
                 }
             });
         }
-        //logout
         
     </script>
 </body>

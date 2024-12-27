@@ -1,22 +1,36 @@
 <?php
-session_start();
+    require_once 'config/db_connection.php';
 
-// Redirect to login page if not authenticated
-if (!isset($_SESSION['user'])) {
-    header('Location: login.php');
-    exit;
-}
+    session_start();
 
-// Function to check permissions
-function checkPermission($requiredPermission) {
-    $permissions = isset($_SESSION['user']['permissions']) ? $_SESSION['user']['permissions'] : '';
+    if (isset($_SESSION['user']['userId'])) {
+        $userId = $_SESSION['user']['userId'];
+        
+        function fetchUserPermissions($userId) {
+            global $conn;
+            
+            $stmt = $conn->prepare("SELECT permission FROM accounts WHERE userId = ?");
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($result->num_rows > 0) {
+                $user = $result->fetch_assoc();
+                return explode(', ', $user['permission']); 
+            }
+            
+            return [];
+        }
 
-    // Check if the required permission exists in the list of permissions
-    $permissionsArray = explode(', ', $permissions);
-    if (!in_array($requiredPermission, $permissionsArray)) {
-        http_response_code(403);
-        echo json_encode(['success' => false, 'message' => 'Access denied!']);
-        exit;
+        $permissions = fetchUserPermissions($userId);
+        echo json_encode([
+            'success' => true,
+            'permissions' => $permissions
+        ]);
+    } else {
+        echo json_encode([
+            'success' => false,
+            'message' => 'User not logged in'
+        ]);
     }
-}
 ?>

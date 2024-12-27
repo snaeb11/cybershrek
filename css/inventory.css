@@ -192,7 +192,7 @@ tr:hover {
     margin-left: 2%;
 }
 
-#action-btn {
+#act-edit-btn {
   position: relative;
   font-family: inherit;
   font-weight: 500;
@@ -207,7 +207,7 @@ tr:hover {
   margin-left: 2%;
 }
 
-#action-btn span {
+#act-edit-btn span {
   position: relative;
   z-index: 10;
   transition: color 0.4s;
@@ -216,12 +216,12 @@ tr:hover {
   padding: 0.8em 1.2em 0.8em 1.05em;
 }
 
-#action-btn:hover span {
+#act-edit-btn:hover span {
   color: white;
 }
 
-#action-btn::before,
-#action-btn::after {
+#act-edit-btn::before,
+#act-edit-btn::after {
   position: absolute;
   top: 0;
   left: 0;
@@ -230,7 +230,7 @@ tr:hover {
   z-index: 0;
 }
 
-#action-btn::before {
+#act-edit-btn::before {
   content: "";
   background: white;
   width: 150%;
@@ -239,11 +239,11 @@ tr:hover {
   transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
 }
 
-#action-btn:hover::before {
+#act-edit-btn:hover::before {
   transform: translate3d(100%, 0, 0);
 }
 
-#action-btn:active {
+#act-edit-btn:active {
   transform: scale(0.95);
 }
 
