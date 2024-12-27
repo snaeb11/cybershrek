@@ -81,13 +81,13 @@
           })
             .then((response) => response.text())
             .then((text) => {
-                console.log("Raw response text:", text); // Log the raw response
+                console.log("Raw response text:", text);
                 try {
-                    const data = JSON.parse(text); // Parse the response
-                    console.log("Parsed response:", data); // Log the parsed data
+                    const data = JSON.parse(text);
+                    console.log("Parsed response:", data);
 
                     if (data.success) {
-                        console.log("userId: ", data.userId);  // Access userId directly
+                        console.log("userId: ", data.userId);
                         let timerInterval;
                   Swal.fire({
                     title: "Login Successful!",
