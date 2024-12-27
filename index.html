@@ -9,49 +9,48 @@
       href="https://fonts.googleapis.com/css2?family=Cambay:ital,wght@0,400;0,700;1,400;1,700&display=swap"
       rel="stylesheet"
     />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
-    />
     <link rel="stylesheet" href="css/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Bread Store</title>
   </head>
   <body>
-    <div class="div" id="white">
-      <div class="textContainer">
-        <img src="resources/Vector.svg" alt="jais. logo" id="jais-logo" />
+    <div class="page-wrapper">
+      <div class="div" id="white">
+        <div class="textContainer">
+          <img src="resources/Vector.svg" alt="jais. logo" id="jais-logo" />
+        </div>
+      </div>
+      <div class="div" id="black">
+        <div class="welcomeContainer">
+          <p class="text" id="welcome">welcome</p>
+        </div>
+  
+        <div class="formContainer">
+          <form action="" class="form" id="login">
+            <input
+              type="email"
+              class="input"
+              id="emailInput"
+              placeholder="Email"
+              autocomplete="off"
+            />
+            <br />
+            <input
+              type="password"
+              class="input"
+              id="passwordInput"
+              placeholder="Password"
+              autocomplete="off"
+            />
+            <br />
+            <a href="createAcc.html" id="skill-issu">Don't have an account?</a>
+            <input type="submit" class="inputButton" id="submit" value="login" />
+          </form>
+        </div>
       </div>
     </div>
-    <div class="div" id="black">
-      <div class="welcomeContainer">
-        <p class="text" id="welcome">welcome</p>
-      </div>
 
-      <div class="formContainer">
-        <form action="" class="form" id="login">
-          <input
-            type="email"
-            class="input"
-            id="emailInput"
-            placeholder="Email"
-            autocomplete="off"
-          />
-          <br />
-          <input
-            type="password"
-            class="input"
-            id="passwordInput"
-            placeholder="Password"
-            autocomplete="off"
-          />
-          <br />
-          <a href="createAcc.html" id="skill-issu">Don't have an account?</a>
-          <input type="submit" class="inputButton" id="submit" value="login" />
-        </form>
-      </div>
-    </div>
-
-    <script>
+    <script defer>
       document.addEventListener("DOMContentLoaded", function () {
         const loginForm = document.getElementById("login");
         const emailInput = document.getElementById("emailInput");
@@ -87,17 +86,29 @@
                   alert("Login successful!");
                   loginRedirect("inventory.html", "Admin");
                 } else {
-                  alert("Login failed: " + data.message);
+                  Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: "Login failed: " + data.message
+                });
                   passwordInput.value = "";
                 }
               } catch (e) {
                 console.error("Error parsing JSON:", e);
-                alert("An error occurred while processing the login response.");
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: "An error occurred while processing the login response."
+                });
               }
             })
             .catch((error) => {
               console.error("Error:", error);
-              alert("Something went wrong. Please try again.");
+              Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: "Something went wrong. Please try again."
+                });
             });
         });
       });
