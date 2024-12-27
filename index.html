@@ -24,7 +24,7 @@
         <div class="welcomeContainer">
           <p class="text" id="welcome">welcome</p>
         </div>
-  
+
         <div class="formContainer">
           <form action="" class="form" id="login">
             <input
@@ -44,7 +44,12 @@
             />
             <br />
             <a href="createAcc.html" id="skill-issu">Don't have an account?</a>
-            <input type="submit" class="inputButton" id="submit" value="login" />
+            <input
+              type="submit"
+              class="inputButton"
+              id="submit"
+              value="login"
+            />
           </form>
         </div>
       </div>
@@ -58,7 +63,6 @@
         const emailInput = document.getElementById("emailInput");
         const passwordInput = document.getElementById("passwordInput");
 
-        // Sanitation function
         // Sanitation function
         function sanitizeInput(input) {
           input = input.replace(/<\/?[^>]+(>|$)/g, "");
@@ -81,14 +85,14 @@
           })
             .then((response) => response.text())
             .then((text) => {
-                console.log("Raw response text:", text);
-                try {
-                    const data = JSON.parse(text);
-                    console.log("Parsed response:", data);
+              console.log("Raw response text:", text);
+              try {
+                const data = JSON.parse(text);
+                console.log("Parsed response:", data);
 
-                    if (data.success) {
-                        console.log("userId: ", data.userId);
-                        let timerInterval;
+                if (data.success) {
+                  console.log("userId: ", data.userId);
+                  let timerInterval;
                   Swal.fire({
                     title: "Login Successful!",
                     html: "Redirecting in <b></b> milliseconds.",
@@ -103,38 +107,38 @@
                     },
                     willClose: () => {
                       clearInterval(timerInterval);
-                    }
+                    },
                   }).then((result) => {
                     /* Read more about handling dismissals below */
                     if (result.dismiss === Swal.DismissReason.timer) {
                       console.log("I was closed by the timer");
-                            loginRedirect("inventory.php", data.userId);
-                        }
+                      loginRedirect("inventory.php", data.userId);
+                    }
                   });
                 } else {
-                        Swal.fire({
+                  Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Login failed: " + data.message,
+                  });
+                  passwordInput.value = "";
+                }
+              } catch (e) {
+                console.error("Error parsing JSON:", e);
+                Swal.fire({
                   icon: "error",
                   title: "Oops...",
-                  text: "Login failed: " + data.message
+                  text: "An error occurred while processing the login response.",
                 });
-                        passwordInput.value = "";
-                    }
-                } catch (e) {
-                    console.error("Error parsing JSON:", e);
-                        Swal.fire({
-                      icon: "error",
-                      title: "Oops...",
-                      text: "An error occurred while processing the login response."
-                    });
-                }
+              }
             })
             .catch((error) => {
-                console.error("Error:", error);
-                alert("Something went wrong. Please try again.");
+              console.error("Error:", error);
+              alert("Something went wrong. Please try again.");
             });
         });
 
-      function loginRedirect(url, userId) {
+        function loginRedirect(url, userId) {
           window.location.href = `${url}?userId=${userId}`;
         }
       });

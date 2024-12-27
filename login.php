@@ -84,11 +84,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = sanitizeInput($_POST['email'] ?? '');
     $password = sanitizeInput($_POST['password'] ?? '');
 
-    if (empty($email) || empty($password)) {
-        echo json_encode(['success' => false, 'message' => 'Please fill in all fields!']);
-        exit;
-    }
-
     // Call the authenticateUser function
     $authResult = authenticateUser($email, $password);
 
