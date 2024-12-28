@@ -252,7 +252,7 @@
                     accountRow[2].checked = permissionList.includes('manage:edit');
                     accountRow[3].checked = permissionList.includes('manage:delete');
 
-                    popup.style.display = 'block';
+                    popup.style.display = 'flex';
                 })
                 .catch((error) => console.error('Error fetching user permissions:', error));
         }
