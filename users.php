@@ -244,7 +244,11 @@
                             Swal.fire('Saved!', data.message, 'success');
                             popup.style.display = 'none';
                         } else {
-                            Swal.fire('Error!', data.message, 'error');
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.message || 'An unexpected error occurred.'
+                            });
                         }
                     })
                     .catch(error => {

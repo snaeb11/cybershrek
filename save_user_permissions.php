@@ -13,6 +13,11 @@
         $userId = $input['userId'];
         $permissions = implode(', ', $input['permissions']);
 
+        if ($userId == 1) {
+            echo json_encode(['status' => 'error', 'message' => 'This user cannot be edited.']);
+            exit;
+        }
+
         $query = "UPDATE accounts SET permission = ? WHERE userId = ?";
         $stmt = $conn->prepare($query);
         $stmt->bind_param("si", $permissions, $userId);
