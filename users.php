@@ -1,3 +1,41 @@
+<?php
+    session_start();
+    require_once 'config/db_connection.php';
+
+    function fetchUserPermissions($userId) {
+        global $conn;
+        
+        $stmt = $conn->prepare("SELECT permission FROM accounts WHERE userId = ?");
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            $user = $result->fetch_assoc();
+            return explode(', ', $user['permission']); 
+        }
+        
+        return []; 
+    }
+
+    // Check if the user is logged in
+    if (isset($_SESSION['user']['userId'])) {
+        $userId = $_SESSION['user']['userId'];
+        $permissions = fetchUserPermissions($userId);
+    
+        $canManageView = in_array('manage:view', $permissions);
+        $canManageEdit = in_array('manage:edit', $permissions);
+    
+        echo "<script>
+            var userId = " . json_encode($userId) . ";
+            var canManageView = " . ($canManageView ? 'true' : 'false') . ";
+            var canManageEdit = " . ($canManageEdit ? 'true' : 'false') . ";
+        </script>";
+    } else {
+        echo "<script>console.log('User is not logged in');</script>";
+    }    
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -98,19 +136,12 @@
                             <td><input type="checkbox" class="update" id="inv-ipd"></td>
                             <td><input type="checkbox" class="delete" id="inv-del"></td>
                         </tr>
-                    </tbody>
-                    <thead>
-                        <tr>
-                            <th>Access</th>
-                            <th>Admin</th>
-                            <th>Clerk</th>
-                        </tr>
-                    </thead>
-                    <tbody>
                         <tr id="accountRow">
                             <td>Account Management</td>
-                            <td><input type="checkbox" class="admin" id="acc-admin"></td>
-                            <td><input type="checkbox" class="clerk" id="acc-clerk"></td>
+                            <td><input type="checkbox" class="read" id="acc-read"></td>
+                            <td><input type="checkbox" class="add" id="acc-add" style="visibility: hidden;"></td>
+                            <td><input type="checkbox" class="update" id="acc-ipd"></td>
+                            <td><input type="checkbox" class="delete" id="acc-del" style="visibility: hidden;"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -123,6 +154,45 @@
     </main>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script defer>
+        class PermissionHandler {
+            constructor() {
+                this.permissions = {
+                    canManageView: typeof canManageView !== 'undefined' ? canManageView : false,
+                    canManageEdit: typeof canManageEdit !== 'undefined' ? canManageEdit : false
+                };
+
+                this.init();
+            }
+
+            init() {
+                if (typeof userId === 'undefined') {
+                    console.log('User not logged in, redirecting...');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                if (!this.permissions.canManageView) {
+                    this.showNoPermissionsMessage();
+                } else {
+                    this.loadAccountsTable();
+                }
+            }
+
+            showNoPermissionsMessage() {
+                const container = document.querySelector('.container');
+                const message = document.createElement('p');
+                message.textContent = "You do not have permissions to view the accounts.";
+                message.style.textAlign = 'center';
+                message.style.fontSize = '20px';
+                message.style.color = 'red';
+
+                container.innerHTML = '';
+                container.appendChild(message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => new PermissionHandler());
+
         const popup = document.getElementById('popup');
         const cancelButton = document.getElementById('cancelButton');
 
@@ -137,16 +207,22 @@
 
                     accounts.forEach(account => {
                         const row = document.createElement('tr');
+                        // Only show the Modify button if user has manage:edit permission
+                        const actionButton = canManageEdit ? 
+                            `<button class="action-btn" data-user-id="${account.userId}"><span>Modify</span></button>` : 
+                            '';
+                        
                         row.innerHTML = `
                             <td>${account.firstName} ${account.lastName}</td>
-                            <td>
-                                <button class="action-btn" data-user-id="${account.userId}"><span>Modify</span></button>
-                            </td>
+                            <td>${actionButton}</td>
                         `;
                         tableBody.appendChild(row);
                     });
 
-                    attachModifyListeners();
+                    // Only attach listeners if manage:edit permission exists
+                    if (canManageEdit) {
+                        attachModifyListeners();
+                    }
                 });
         });
 
@@ -171,8 +247,10 @@
                     inventoryRow[2].checked = permissionList.includes('inventory:edit');
                     inventoryRow[3].checked = permissionList.includes('inventory:delete');
 
-                    accountRow[0].checked = permissionList.includes('manage:admin');
-                    accountRow[1].checked = permissionList.includes('manage:clerk');
+                    accountRow[0].checked = permissionList.includes('manage:view');
+                    accountRow[1].checked = permissionList.includes('manage:add');
+                    accountRow[2].checked = permissionList.includes('manage:edit');
+                    accountRow[3].checked = permissionList.includes('manage:delete');
 
                     popup.style.display = 'block';
                 })
@@ -209,8 +287,10 @@
             if (inventoryRow[2].checked) permissions.push('inventory:edit');
             if (inventoryRow[3].checked) permissions.push('inventory:delete');
 
-            if (accountRow[0].checked) permissions.push('manage:admin');
-            if (accountRow[1].checked) permissions.push('manage:clerk');
+            if (accountRow[0].checked) permissions.push('manage:view');
+            if (accountRow[1].checked) permissions.push('manage:add');
+            if (accountRow[2].checked) permissions.push('manage:edit');
+            if (accountRow[3].checked) permissions.push('manage:delete');
 
             console.log('Permissions:', permissions);
 

@@ -29,8 +29,8 @@
         $canAddInventory = in_array('inventory:add', $permissions);
         $canEditInventory = in_array('inventory:edit', $permissions);
         $canDeleteInventory = in_array('inventory:delete', $permissions);
-        $canManageAdmin = in_array('manage:admin', $permissions);
-        $canManageClerk = in_array('manage:clerk', $permissions);
+        $canManageView = in_array('manage:view', $permissions);
+        $canManageEdit = in_array('manage:edit', $permissions);
 
         echo "<script>
             var userId = " . json_encode($userId) . ";
@@ -38,10 +38,10 @@
             var canAddInventory = " . ($canAddInventory ? 'true' : 'false') . ";
             var canEditInventory = " . ($canEditInventory ? 'true' : 'false') . ";
             var canDeleteInventory = " . ($canDeleteInventory ? 'true' : 'false') . ";
-            var canManageAdmin = " . ($canManageAdmin ? 'true' : 'false') . ";
-            var canManageClerk = " . ($canManageClerk ? 'true' : 'false') . ";
+            var canManageView = " . ($canManageView ? 'true' : 'false') . ";
+            var canManageEdit = " . ($canManageEdit ? 'true' : 'false') . ";
             console.log('User ID:', userId);
-            console.log('Permissions:', { canViewInventory, canAddInventory , canEditInventory, canDeleteInventory, canManageAdmin, canManageClerk});
+            console.log('Permissions:', { canViewInventory, canAddInventory , canEditInventory, canDeleteInventory, canManageView, canManageEdit});
         </script>";
     } else {
         
@@ -165,8 +165,8 @@
                     canEdit: typeof canEditInventory !== 'undefined' ? canEditInventory : false,
                     canDelete: typeof canDeleteInventory !== 'undefined' ? canDeleteInventory : false,
                     canAdd: typeof canAddInventory !== 'undefined' ? canAddInventory : false,
-                    canManageClerk: typeof canManageClerk !== 'undefined' ? canManageClerk : false,
-                    canManageAdmin: typeof canManageAdmin !== 'undefined' ? canManageAdmin : false
+                    canManageView: typeof canManageView !== 'undefined' ? canManageView : false,
+                    canManageEdit: typeof canManageEdit !== 'undefined' ? canManageEdit : false
                 };
                 
                 // Initialize permission checks
@@ -194,13 +194,13 @@
                 const userSettingsMenu = document.querySelector('li a[href="users.php"]');
                 const logsMenu = document.querySelector('li a[href="logs.html"]');
                 
-                // Hide "User Settings" if the user does not have manage:clerk or manage:admin permission
-                if (userSettingsMenu && !(this.permissions.canManageClerk || this.permissions.canManageAdmin)) {
+                // Hide "User Settings" if the user does not have manage:view or manage:edit permission
+                if (userSettingsMenu && !(this.permissions.canManageEdit || this.permissions.canManageView)) {
                     userSettingsMenu.parentElement.style.display = 'none';
                 }
                 
                 // Hide "Logs" if the user does not have manage:admin permission
-                if (logsMenu && !this.permissions.canManageAdmin) {
+                if (logsMenu && !this.permissions.canManageView) {
                     logsMenu.parentElement.style.display = 'none';
                 }
             }
