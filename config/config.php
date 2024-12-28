@@ -9,6 +9,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 date_default_timezone_set('Asia/Manila');
 
+session_start();
+
 // Load environment variables from the .env file
 $envFile = __DIR__ . '/../.env';
 $envContents = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -88,6 +90,22 @@ try {
     echo $e->getMessage();
 }
 
-$conn->close();
+//create logs table
+try {
+    $sqlT = "CREATE TABLE IF NOT EXISTS logs (
+        email VARCHAR(255) NOT NULL,
+        activity_log VARCHAR(255) NOT NULL,
+        date VARCHAR(20) NOT NULL, -- Format: 'Month 00, 0000'
+        time TIME NOT NULL         -- Format: 'HH:MM' (24-hour format)
+    );";
+
+    if ($conn->query($sqlT) === TRUE) {
+        echo "User Activity Logs table created successfully.<br>";
+    } else {
+        echo "Error creating User Activity Logs table: " . $conn->error . "<br>";
+    }
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage() . "<br>";
+}
 
 ?>

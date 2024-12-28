@@ -512,21 +512,51 @@
 
         // Logout Function
         function logout() {
-            Swal.fire({
-                title: 'Logout',
-                text: 'Are you sure you want to logout?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#9F6D45',
-                confirmButtonText: 'Logout',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = 'index.html';
+    Swal.fire({
+        title: 'Logout',
+        text: 'Are you sure you want to logout?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#9F6D45',
+        confirmButtonText: 'Logout',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('logout.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Logged Out!',
+                        text: 'You have been successfully logged out',
+                        icon: 'success',
+                        timer: 1500,
+                        timerProgressBar: true,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = 'index.html';
+                    });
+                } else {
+                    throw new Error(data.message || 'Logout failed');
+                }
+            })
+            .catch(error => {
+                console.error('Logout error:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'An error occurred during logout',
+                    icon: 'error'
+                });
             });
         }
+    });
+}
         
     </script>
 </body>

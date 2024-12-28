@@ -1,14 +1,14 @@
 <?php
 require_once 'config/db_connection.php';
 
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 header('Content-Type: application/json');
 
-//sanitation fileter
+session_start();
+
 function sanitizeInput($input) {
     return htmlspecialchars(strip_tags(trim($input)), ENT_QUOTES, 'UTF-8');
 }
@@ -34,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($stmt->execute()) {
         // Success response
         echo json_encode(["success" => true, "message" => "Item added successfully!"]);
+        insertUserActivityLog($_SESSION['user_email'], "Added bread: " . $productName);
     } else {
         // Error response
         echo json_encode(["success" => false, "message" => "Failed to add item."]);
@@ -45,5 +46,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     // If not a POST request, return an error
     echo json_encode(["success" => false, "message" => "Invalid request method."]);
+}
+
+function insertUserActivityLog($username, $activity) {
+    global $conn;
+
+    try {
+        // Get the current date and time
+        $date = date("F d, Y"); // Format: Month Day, Year (e.g., October 28, 2024)
+        $time = date("H:i");    // Format: HH:MM (24-hour format)
+
+        // Prepare the query to insert the activity log
+        $stmt = $conn->prepare("INSERT INTO logs (email, activity_log, date, time) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $username, $activity, $date, $time);
+
+        // Execute the query
+        if ($stmt->execute()) {
+            return ['success' => true, 'message' => 'Activity log inserted successfully!'];
+        } else {
+            return ['success' => false, 'message' => 'Error inserting activity log: ' . $stmt->error];
+        }
+    } catch (Exception $e) {
+        return ['success' => false, 'message' => 'Error: ' . $e->getMessage()];
+    }
 }
 ?>
