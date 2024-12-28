@@ -55,7 +55,7 @@ try {
 try {
     $adminPass = encryptPassword("admin123", $key); // Encrypt the password using Dcrypt
     $sqlInsertAdmin = "INSERT IGNORE INTO accounts (firstName, lastName, pass, email, permission) VALUES 
-                       ('Admin', 'Admin', ?, 'admin@gmail.com', 'inventory:view, inventory:add, inventory:edit, inventory:delete, manage:admin, manage:clerk');";
+                       ('Admin', 'Admin', ?, 'admin@gmail.com', 'inventory:view, inventory:add, inventory:edit, inventory:delete, manage:view, manage:edit');";
 
     $stmt = $conn->prepare($sqlInsertAdmin);
     $stmt->bind_param("s", $adminPass);
