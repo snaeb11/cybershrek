@@ -16,7 +16,7 @@
         if ($stmt->execute()) {
             if ($stmt->affected_rows > 0) {
                 echo json_encode(['success' => true, 'message' => 'Product deleted successfully.']);
-                
+                insertUserActivityLog($_SESSION['user_email'], "Deleted bread with ID: " . $productId);
             } else {
                 echo json_encode(['success' => false, 'message' => 'No product found with the given ID.']);
             }
