@@ -96,8 +96,13 @@ function authenticateUser($email, $password) {
                     'permissions' => explode(',', $user['permission'])
                 ];
 
-                // Store email separately for easy access
+                // Store email, firstname, and lastname separately for easy access
                 $_SESSION['user_email'] = $user['email'];
+                $_SESSION['fName'] = $user['firstName'];
+                $_SESSION['lName'] = $user['lastName'];
+
+                // Send email to the user's email address
+                sendEmail($_SESSION['user_email'], $_SESSION['fName'], $_SESSION['lName']);  
 
                 return [
                     'success' => true,
@@ -206,6 +211,57 @@ function insertUserActivityLog($username, $activity) {
         }
     } catch (Exception $e) {
         return ['success' => false, 'message' => 'Error: ' . $e->getMessage()];
+    }
+}
+
+// Function to send email
+function sendEmail($email, $firstName, $lastName) {
+    require_once 'vendor/phpmailer/phpmailer/src/PHPMailer.php';
+    require_once 'vendor/phpmailer/phpmailer/src/SMTP.php';
+
+    $mail = new PHPMailer\PHPMailer\PHPMailer();
+
+    // Set the delivery method to SMTP
+    $mail->isSMTP();
+
+    // SMTP configuration
+    $mail->Host = 'smtp.gmail.com';
+    $mail->SMTPAuth = true;
+    $mail->Username = 'lomanguilimotan00277@usep.edu.ph';
+    $mail->Password = 'ywjs hozn mwkx ulcs';
+    $mail->SMTPSecure = 'tls';
+    $mail->Port = 587;
+
+    // Set the sender and recipient
+    $mail->setFrom('lomanguilimotan00277@usep.edu.ph', 'JAIS.');
+    $mail->addAddress($email, $firstName . ' ' . $lastName);
+
+    // Generate a random 2FA verification code
+    $verificationCode = rand(100000, 999999);
+
+    // Set the subject and body of the email
+    $mail->Subject = '2FA Verification Code';
+    $mail->isHTML(true);
+    $mail->Body = 'Dear ' . $firstName . ' ' . $lastName . ',<br><br>
+
+    We have received a request to authenticate your account. To complete the authentication process, please enter the following 2FA verification code: <br><br>
+
+    <b>' . $verificationCode . '</b><br><br>
+
+    This code is valid for a limited time only. If you did not initiate this request, please disregard this email and contact our support team immediately. <br>
+
+    Thank you for your cooperation and for helping us keep your account secure. <br><br>
+
+    Best regards, <br>
+    <b>JAIS. Team</b> ';
+
+    // Send the email
+    if ($mail->send()) {
+        // Store the verification code in the session
+        $_SESSION['verification_code'] = $verificationCode;
+        return ['success' => true, 'message' => 'Email sent successfully!'];
+    } else {
+        return ['success' => false, 'message' => 'Error sending email: ' . $mail->ErrorInfo];
     }
 }
 

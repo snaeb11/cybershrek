@@ -1,6 +1,7 @@
 {
     "require": {
-        "mmeyer2k/dcrypt": "^13.2"
+        "mmeyer2k/dcrypt": "^13.2",
+        "phpmailer/phpmailer": "^6.5"
     },
     "scripts": {
         "post-clone-cmd": "composer install"

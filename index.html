@@ -73,93 +73,96 @@
           return temp.innerHTML;
         }
 
-      loginForm.addEventListener("submit", function (event) {
-        event.preventDefault();
+        loginForm.addEventListener("submit", function (event) {
+          event.preventDefault();
 
-        const email = sanitizeInput(emailInput.value.trim());
-        const password = sanitizeInput(passwordInput.value.trim());
+          const email = sanitizeInput(emailInput.value.trim());
+          const password = sanitizeInput(passwordInput.value.trim());
 
-        console.log("Sending login request...");
+          console.log("Sending login request...");
 
-        fetch("login.php", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams({ email: email, password: password }),
-        })
-          .then((response) => {
-            console.log("Response status:", response.status);
-            console.log("Response headers:", Object.fromEntries(response.headers));
-            return response.text();
+          fetch("login.php", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({ email: email, password: password }),
           })
-          .then((text) => {
-            console.log("Raw response text:", text);
-            
-            // Try to parse the response as JSON
-            try {
-              const data = JSON.parse(text);
-              console.log("Parsed JSON response:", data);
+            .then((response) => {
+              console.log("Response status:", response.status);
+              console.log(
+                "Response headers:",
+                Object.fromEntries(response.headers)
+              );
+              return response.text();
+            })
+            .then((text) => {
+              console.log("Raw response text:", text);
 
-              if (data.success) {
-                console.log("Login successful, userId:", data.userId);
-                Swal.fire({
-                  title: "Login Successful!",
-                  html: "Redirecting in <b></b> milliseconds.",
-                  timer: 1000,
-                  timerProgressBar: true,
-                  didOpen: () => {
-                    Swal.showLoading();
-                    const timer = Swal.getPopup().querySelector("b");
-                    timerInterval = setInterval(() => {
-                      timer.textContent = `${Swal.getTimerLeft()}`;
-                    }, 100);
-                  },
-                  willClose: () => {
-                    clearInterval(timerInterval);
-                  },
-                }).then((result) => {
-                  if (result.dismiss === Swal.DismissReason.timer) {
-                    if (data.userId) {
-                      window.location.href = `inventory.php?userId=${data.userId}`;
-                    } else {
-                      console.error("No userId in response");
-                      Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: "User ID not found in response",
-                      });
+              // Try to parse the response as JSON
+              try {
+                const data = JSON.parse(text);
+                console.log("Parsed JSON response:", data);
+
+                if (data.success) {
+                  console.log("Authentication Required, userId:", data.userId);
+                  Swal.fire({
+                    title: "Authentication Required",
+                    html: "Redirecting in <b></b> milliseconds.",
+                    timer: 750,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                      Swal.showLoading();
+                      const timer = Swal.getPopup().querySelector("b");
+                      timerInterval = setInterval(() => {
+                        timer.textContent = `${Swal.getTimerLeft()}`;
+                      }, 100);
+                    },
+                    willClose: () => {
+                      clearInterval(timerInterval);
+                    },
+                  }).then((result) => {
+                    if (result.dismiss === Swal.DismissReason.timer) {
+                      if (data.userId) {
+                        window.location.href = `2fa.html?userId=${data.userId}`;
+                      } else {
+                        console.error("No userId in response");
+                        Swal.fire({
+                          icon: "error",
+                          title: "Error",
+                          text: "User ID not found in response",
+                        });
+                      }
                     }
-                  }
-                });
-              } else {
-                console.error("Login failed:", data.message);
+                  });
+                } else {
+                  console.error("Login failed:", data.message);
+                  Swal.fire({
+                    icon: "error",
+                    title: "Login Failed",
+                    text: data.message || "Unknown error occurred",
+                  });
+                  passwordInput.value = "";
+                }
+              } catch (e) {
+                console.error("JSON parse error:", e);
+                console.error("Raw response text:", text);
                 Swal.fire({
                   icon: "error",
-                  title: "Login Failed",
-                  text: data.message || "Unknown error occurred",
+                  title: "Error",
+                  text: "Invalid response from server. Check console for details.",
                 });
-                passwordInput.value = "";
               }
-            } catch (e) {
-              console.error("JSON parse error:", e);
-              console.error("Raw response text:", text);
+            })
+            .catch((error) => {
+              console.error("Fetch error:", error);
               Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: "Invalid response from server. Check console for details.",
+                text: "Connection error occurred",
               });
-            }
-          })
-          .catch((error) => {
-            console.error("Fetch error:", error);
-            Swal.fire({
-              icon: "error",
-              title: "Error",
-              text: "Connection error occurred",
             });
-          });
-      });
+        });
 
         function loginRedirect(url, userId) {
           window.location.href = `${url}?userId=${userId}`;

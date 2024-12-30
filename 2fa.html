@@ -26,27 +26,134 @@
         </div>
 
         <div class="formContainer">
-          <form action="" class="form" id="login">
+          <form class="form" id="verificationForm">
             <p id="topText">Authenticate Your Account</p>
             <p id="bottomText">A code has been sent to your email.</p>
             <input
               type="text"
               class="input"
-              id="emailInput"
-              placeholder="2FA Code"
+              id="verificationCode"
+              name="verificationCode"
+              placeholder="Verification Code"
               autocomplete="off"
               required
             />
             <br />
-            <!-- add resend() function -->
             <a onclick="resend()" id="skill-issu">Resend</a>
-            <input
-              type="submit"
-              class="inputButton"
-              id="submit"
-              value="Submit"
-            />
+            <button type="submit" class="inputButton" id="submit">
+              Submit
+            </button>
           </form>
         </div>
       </div>
     </div>
+
+    <script defer>
+      document.addEventListener("DOMContentLoaded", function () {
+        const verificationForm = document.getElementById("verificationForm");
+        const verificationCodeInput =
+          document.getElementById("verificationCode");
+
+        // Function to sanitize input
+        function sanitizeInput(input) {
+          input = input.replace(/<\/?[^>]+(>|$)/g, "");
+          const temp = document.createElement("div");
+          temp.textContent = input.trim();
+          return temp.innerHTML;
+        }
+
+        verificationForm.addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const verificationCode = sanitizeInput(
+            verificationCodeInput.value.trim()
+          );
+          const payload = { verificationCode };
+
+          console.log("Sending verification request...");
+
+          fetch("verify.php", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          })
+            .then((response) => {
+              console.log("Response status:", response.status);
+              console.log(
+                "Response headers:",
+                Object.fromEntries(response.headers)
+              );
+              return response.text();
+            })
+            .then((text) => {
+              console.log("Raw response text:", text);
+
+              // Try to parse the response as JSON
+              try {
+                const data = JSON.parse(text);
+                console.log("Parsed JSON response:", data);
+
+                if (data.success) {
+                  Swal.fire({
+                    icon: "success",
+                    title: "Verification Successful!",
+                    html: "Redirecting in <b></b> milliseconds.",
+                    timer: 1200,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                      Swal.showLoading();
+                      const timer = Swal.getPopup().querySelector("b");
+                      let timerInterval = setInterval(() => {
+                        timer.textContent = `${Swal.getTimerLeft()}`;
+                      }, 100);
+                    },
+                    willClose: () => {
+                      clearInterval(timerInterval);
+                    },
+                  }).then((result) => {
+                    if (result.dismiss === Swal.DismissReason.timer) {
+                      if (data.userId) {
+                        window.location.href = `inventory.php?userId=${data.userId}`;
+                      } else {
+                        console.error("No userId in response");
+                        Swal.fire({
+                          icon: "error",
+                          title: "Error",
+                          text: "User ID not found in response",
+                        });
+                      }
+                    }
+                  });
+                } else {
+                  console.error("Verification failed:", data.message);
+                  Swal.fire({
+                    icon: "error",
+                    title: "Verification Failed",
+                    text: data.message || "Unknown error occurred",
+                  });
+                }
+              } catch (e) {
+                console.error("JSON parse error:", e);
+                console.error("Raw response text:", text);
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: "Invalid response from server. Check console for details.",
+                });
+              }
+            })
+            .catch((error) => {
+              console.error("Fetch error:", error);
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Connection error occurred",
+              });
+            });
+        });
+      });
+    </script>
+  </body>
+</html>
