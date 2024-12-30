@@ -81,10 +81,6 @@
           })
             .then((response) => {
               console.log("Response status:", response.status);
-              console.log(
-                "Response headers:",
-                Object.fromEntries(response.headers)
-              );
               return response.text();
             })
             .then((text) => {
@@ -96,6 +92,10 @@
                 console.log("Parsed JSON response:", data);
 
                 if (data.success) {
+                  console.log("Verification successful, redirecting...");
+
+                  let timerInterval; // Declare timerInterval here, outside of didOpen
+
                   Swal.fire({
                     icon: "success",
                     title: "Verification Successful!",
@@ -105,7 +105,9 @@
                     didOpen: () => {
                       Swal.showLoading();
                       const timer = Swal.getPopup().querySelector("b");
-                      let timerInterval = setInterval(() => {
+
+                      // Start the timer interval here
+                      timerInterval = setInterval(() => {
                         timer.textContent = `${Swal.getTimerLeft()}`;
                       }, 100);
                     },
@@ -114,16 +116,9 @@
                     },
                   }).then((result) => {
                     if (result.dismiss === Swal.DismissReason.timer) {
-                      if (data.userId) {
-                        window.location.href = `inventory.php?userId=${data.userId}`;
-                      } else {
-                        console.error("No userId in response");
-                        Swal.fire({
-                          icon: "error",
-                          title: "Error",
-                          text: "User ID not found in response",
-                        });
-                      }
+                      console.log("Redirecting now...");
+                      // Directly redirect to inventory.php
+                      window.location.href = "inventory.php";
                     }
                   });
                 } else {
