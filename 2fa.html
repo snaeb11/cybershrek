@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cambay:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/2fa.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Bread Store</title>
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <div class="div" id="white">
+        <div class="textContainer">
+          <img src="resources/Vector.svg" alt="jais. logo" id="jais-logo" />
+        </div>
+      </div>
+      <div class="div" id="black">
+        <div class="welcomeContainer">
+          <p class="text" id="welcome">two-factor</p>
+        </div>
+
+        <div class="formContainer">
+          <form action="" class="form" id="login">
+            <p id="topText">Authenticate Your Account</p>
+            <p id="bottomText">A code has been sent to your email.</p>
+            <input
+              type="text"
+              class="input"
+              id="emailInput"
+              placeholder="2FA Code"
+              autocomplete="off"
+              required
+            />
+            <br />
+            <!-- add resend() function -->
+            <a onclick="resend()" id="skill-issu">Resend</a>
+            <input
+              type="submit"
+              class="inputButton"
+              id="submit"
+              value="Submit"
+            />
+          </form>
+        </div>
+      </div>
+    </div>

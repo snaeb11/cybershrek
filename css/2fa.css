@@ -1,0 +1,232 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+body{
+    display: flex;
+    font-family: 'Cambay', sans-serif;
+    position: relative;
+}
+
+.page-wrapper {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+}
+
+.swal2-container {
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+}
+
+.swal2-popup {
+    margin: auto !important;
+}
+
+body.swal2-shown > .page-wrapper {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.swal2-backdrop-show {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+}
+
+body.swal2-shown {
+    padding-right: 0 !important;
+}
+
+.div{
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#white{
+    display: flex;
+}
+
+#black{
+    display: flex;
+    background-image: url(../resources/breadPat.jpg);
+    background-size: cover;
+    background-position: center;
+    background-size: 500px 500px;
+    background-repeat: repeat;
+    background-color: #1b1b1b;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+#black::before{
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(159, 109,69, 0.9);
+}
+
+#black > * {
+    position: relative;
+    z-index: 2;
+}
+
+#welcome{
+    align-items: baseline;
+}
+
+.textContainer{
+    display: flex;
+}
+
+#jais-logo{
+    height: auto;
+    max-width: 125%;
+}
+
+.welcomeContainer{
+    display: flex;
+    justify-content: center;
+}
+
+#welcome{
+    font-size: 70px;
+    font-weight: 1000;
+    color: white;
+    margin: auto;
+}
+
+.formContainer{
+    display: flex;
+    justify-content: center;
+    width: 75%;
+}
+
+.form{
+    display: flex;
+    margin: 0;
+    flex-direction: column;
+    padding: 10%;
+    padding-top: 5%;
+    padding-bottom: 5%;
+    width: 50%;
+    border-radius: 15px;
+    background-color: white;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+#topText, #bottomText{
+    margin: 0;
+    color: #9f6d45;
+}
+
+#topText{
+    font-size: 25px;
+    font-weight: bold;
+}
+
+#bottomText{
+    margin-bottom: 15%;
+}
+
+.input{
+    border: none;
+    border-bottom: 1px solid #9f6d45;
+    outline: none;
+    background-color: transparent;
+    color: #9f6d45;
+    padding: 5px;
+    padding-bottom: 0;
+    font-size: 15px;
+}
+
+input::placeholder{
+    color: #9f6d45;
+    opacity: 1;
+}
+
+input:focus{
+    border-bottom: 1px solid #9f6d45;
+}
+
+.inputButton{
+    background: none;
+    border: none;
+    color: black;
+    font: inherit;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    text-align: right;
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.inputButton:focus{
+    border: none;
+}
+
+a{
+    color: #9f6d45;
+    text-decoration: none;
+    margin: 0;
+    padding: 0;
+    width: 50%;
+}
+
+a:visited{
+    color: #9f6d45;
+}
+
+a:hover{
+    color: #9f6d45;
+    text-decoration: underline;
+}
+
+a:active{
+    color: #9f6d45;
+}
+
+.inputButton{
+    font-family: 'Cambay', sans-serif;
+    background: linear-gradient(to right, rgb(8, 41, 150),rgb(255, 208, 0),rgb(241, 241, 241));
+    background-size: 200% 200%;
+    animation: rainbow 2s ease-in-out infinite;
+    background-clip: text;
+    -webkit-background-clip:text;
+    color: #9f6d45;
+    font-size:25px;
+    transition: color .2s ease-in-out;
+    font-weight:700;
+}
+
+.inputButton:hover{
+    color:rgba(0,0,0,0);
+    border: none;
+}
+
+
+
+@keyframes rainbow { 
+    0%{background-position:left}
+    50%{background-position:right}
+    100%{background-position:left}
+}
