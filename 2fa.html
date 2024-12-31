@@ -39,7 +39,7 @@
               required
             />
             <br />
-            <a onclick="resend()" id="skill-issu">Resend</a>
+            <a onclick="resend()" id="resendButton">Resend</a>
             <button type="submit" class="inputButton" id="submit">
               Submit
             </button>
@@ -149,6 +149,62 @@
             });
         });
       });
+
+      function resend() {
+        const resendButton = document.getElementById("resendButton");
+
+        // Prevent further clicks if the button is already disabled
+        if (resendButton.classList.contains("disabled")) return;
+
+        // Disable the button and update its appearance
+        resendButton.classList.add("disabled");
+        resendButton.textContent = "Resend (60)";
+        let remainingTime = 60;
+
+        // Start the countdown timer
+        const timer = setInterval(() => {
+          remainingTime -= 1;
+          resendButton.textContent = `Resend (${remainingTime})`;
+
+          if (remainingTime <= 0) {
+            clearInterval(timer);
+            resendButton.textContent = "Resend";
+            resendButton.classList.remove("disabled");
+          }
+        }, 1000);
+
+        // Send the resend email request directly to resend_email.php
+        fetch("resend_email.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            action: "resend_email", // Action to resend email
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              console.log(data.message);
+              Swal.fire({
+                icon: "success",
+                title: "Resent Successfully!",
+                text: "A new verification code has been sent to your email.",
+              });
+            } else {
+              throw new Error(data.message || "Failed to resend email");
+            }
+          })
+          .catch((error) => {
+            console.error("Error resending email:", error);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Failed to resend the email. Please try again later.",
+            });
+          });
+      }
     </script>
   </body>
 </html>

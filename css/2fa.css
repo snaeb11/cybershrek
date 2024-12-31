@@ -223,7 +223,20 @@ a:active{
     border: none;
 }
 
+#resendButton {
+    color: #9f6d45;
+    cursor: pointer; 
+}
 
+#resendButton:hover {
+    text-decoration: underline;
+}
+  
+#resendButton.disabled {
+    color: gray;      
+    cursor: not-allowed; 
+    text-decoration: none; 
+}
 
 @keyframes rainbow { 
     0%{background-position:left}
