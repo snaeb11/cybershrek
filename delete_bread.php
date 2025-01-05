@@ -32,14 +32,17 @@
         global $conn;
     
         try {
+            // Set timezone to Asia/Manila
+            date_default_timezone_set("Asia/Manila");
+    
             // Get the current date and time
             $date = date("F d, Y"); // Format: Month Day, Year (e.g., October 28, 2024)
             $time = date("H:i");    // Format: HH:MM (24-hour format)
-            
+    
             // Prepare the query to insert the activity log
             $stmt = $conn->prepare("INSERT INTO logs (email, activity_log, date, time) VALUES (?, ?, ?, ?)");
             $stmt->bind_param("ssss", $username, $activity, $date, $time);
-            
+    
             // Execute the query
             if ($stmt->execute()) {
                 return ['success' => true, 'message' => 'Activity log inserted successfully!'];
@@ -50,4 +53,5 @@
             return ['success' => false, 'message' => 'Error: ' . $e->getMessage()];
         }
     }
+    
 ?>

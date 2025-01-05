@@ -46,6 +46,9 @@
         global $conn;
     
         try {
+            // Set timezone to Asia/Manila
+            date_default_timezone_set("Asia/Manila");
+    
             // Get the current date and time
             $date = date("F d, Y"); // Format: Month Day, Year (e.g., October 28, 2024)
             $time = date("H:i");    // Format: HH:MM (24-hour format)
@@ -64,4 +67,5 @@
             return ['success' => false, 'message' => 'Error: ' . $e->getMessage()];
         }
     }
+    
 ?>
