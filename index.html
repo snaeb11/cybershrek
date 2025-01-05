@@ -1,218 +1,281 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cambay:ital,wght@0,400;0,700;1,400;1,700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="css/index.css" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cambay:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="lib/datatables/dataTables.css">
+    <link rel="stylesheet" href="css/index.css">
+    <title>Dashboiard</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Bread Store</title>
-  </head>
-  <body>
-    <div class="page-wrapper">
-      <div class="div" id="white">
-        <div class="textContainer">
-          <img src="resources/Vector.svg" alt="jais. logo" id="jais-logo" />
+</head>
+<body>
+    <main>
+        <div class="titleInventory">
+            <p class="text" id="inventoryTitle">Welcome Customer!</p>
         </div>
-      </div>
-      <div class="div" id="black">
-        <div class="welcomeContainer">
-          <p class="text" id="welcome">welcome</p>
+    
+        <div class="wrapper">
+            <div class="tableContent">
+                <table id="myTable" class="display">
+                    <thead>
+                        <tr>
+                            <th>Product ID</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--dynamically generated from database -->
+                    </tbody>
+                </table>
+                <!-- <button class="cssbuttons-io-button"  id="addItemButton">
+                    Add Item
+                    <div class="icon">
+                        <svg
+                          height="24"
+                          width="24"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M0 0h24v24H0z" fill="none"></path>
+                          <path
+                            d="M12 5v14m-7-7h14"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            fill="none"
+                            stroke-linecap="round"
+                          ></path>
+                        </svg>
+                      </div>                  
+                  </button> -->
+            </div>
         </div>
-
-        <div class="formContainer">
-          <form action="" class="form" id="login">
-            <input
-              type="email"
-              class="input"
-              id="emailInput"
-              placeholder="Email"
-              autocomplete="off"
-              required
-            />
-            <br />
-            <input
-              type="password"
-              class="input"
-              id="passwordInput"
-              placeholder="Password"
-              autocomplete="off"
-              required
-            />
-            <br />
-            <a href="createAcc.html" id="skill-issu">Don't have an account?</a>
-            <input
-              type="submit"
-              class="inputButton"
-              id="submit"
-              value="login"
-            />
-          </form>
-        </div>
-      </div>
-    </div>
+    </main>
+    <script src="lib/jQuery/jquery-3.7.1.min.js"></script>
+    <script src="lib/datatables/dataTables.js"></script>
 
     <script defer>
-      document.addEventListener("DOMContentLoaded", function () {
-        console.log("DOMContentLoaded triggered");
-        console.log("DOMContentLoaded triggered");
-        const loginForm = document.getElementById("login");
-        const emailInput = document.getElementById("emailInput");
-        const passwordInput = document.getElementById("passwordInput");
+        // Permission handler utility
+        // class PermissionHandler {
+        //     constructor() {
+        //         // Store permissions from PHP session
+        //         this.permissions = {
+        //             canView: typeof canViewInventory !== 'undefined' ? canViewInventory : false,
+        //             canEdit: typeof canEditInventory !== 'undefined' ? canEditInventory : false,
+        //             canDelete: typeof canDeleteInventory !== 'undefined' ? canDeleteInventory : false,
+        //             canAdd: typeof canAddInventory !== 'undefined' ? canAddInventory : false,
+        //             canManageView: typeof canManageView !== 'undefined' ? canManageView : false,
+        //             canManageEdit: typeof canManageEdit !== 'undefined' ? canManageEdit : false
+        //         };
+                
+        //         // Initialize permission checks
+        //         this.init();
+        //     }
 
-        // Sanitation function
-        function sanitizeInput(input) {
-          input = input.replace(/<\/?[^>]+(>|$)/g, "");
-          const temp = document.createElement("div");
-          temp.textContent = input.trim();
-          return temp.innerHTML;
-        }
+        //     init() {
+        //         // Check if user is logged in
+        //         if (typeof userId === 'undefined') {
+        //             console.log('User not logged in, redirecting...');
+        //             window.location.href = 'login.html';
+        //             return;
+        //         }
 
-        loginForm.addEventListener("submit", function (event) {
-          event.preventDefault();
+        //         this.hideRestrictedMenuItems();
+        //         if (!this.permissions.canView) {
+        //             this.hideInventoryTable();
+        //         } else {
+        //             this.setupEventListeners();
+        //             this.applyPermissions();
+        //         }
+        //     }
 
-          const email = sanitizeInput(emailInput.value.trim());
-          const password = sanitizeInput(passwordInput.value.trim());
+        //     hideRestrictedMenuItems() {
+        //         const userSettingsMenu = document.querySelector('li a[href="users.php"]');
+        //         const logsMenu = document.querySelector('li a[href="logs.html"]');
+                
+        //         // Hide "User Settings" if the user does not have manage:view or manage:edit permission
+        //         if (userSettingsMenu && !(this.permissions.canManageEdit || this.permissions.canManageView)) {
+        //             userSettingsMenu.parentElement.style.display = 'none';
+        //         }
+                
+        //         // Hide "Logs" if the user does not have manage:admin permission
+        //         if (logsMenu && !this.permissions.canManageView) {
+        //             logsMenu.parentElement.style.display = 'none';
+        //         }
+        //     }
 
-          console.log("Sending login request...");
+        //     setupEventListeners() {
+        //         // Watch for dynamic table changes
+        //         const tableBody = document.querySelector('#myTable tbody');
+        //         if (tableBody) {
+        //             const observer = new MutationObserver(() => this.applyPermissions());
+        //             observer.observe(tableBody, { 
+        //                 childList: true, 
+        //                 subtree: true 
+        //             });
+        //         }
+        //     }
 
-          fetch("login.php", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams({ email: email, password: password }),
-          })
-            .then((response) => {
-              console.log("Response status:", response.status);
-              console.log(
-                "Response headers:",
-                Object.fromEntries(response.headers)
-              );
-              return response.text();
-            })
-            .then((text) => {
-              console.log("Raw response text:", text);
+        //     applyPermissions() {
+        //         // Handle Add button
+        //         const addButton = document.getElementById('addItemButton');
+        //         if (addButton) {
+        //             addButton.style.display = this.permissions.canAdd ? 'flex' : 'none';
+        //         }
 
-              // Try to parse the response as JSON
-              try {
-                const data = JSON.parse(text);
-                console.log("Parsed JSON response:", data);
+        //         // Handle Edit and Delete buttons
+        //         const rows = document.querySelectorAll('#myTable tbody tr');
+        //         rows.forEach(row => {
+        //             const actionCell = row.querySelector('td:last-child');
+        //             if (actionCell) {
+        //                 const editButton = actionCell.querySelector('.edit-btn');
+        //                 const deleteButton = actionCell.querySelector('.delete-btn');
 
-                if (data.success) {
-                  console.log("Authentication Required, userId:", data.userId);
-                  Swal.fire({
-                    title: "Authentication Required",
-                    html: "Redirecting in <b></b> milliseconds.",
-                    timer: 750,
-                    timerProgressBar: true,
-                    didOpen: () => {
-                      Swal.showLoading();
-                      const timer = Swal.getPopup().querySelector("b");
-                      timerInterval = setInterval(() => {
-                        timer.textContent = `${Swal.getTimerLeft()}`;
-                      }, 100);
-                    },
-                    willClose: () => {
-                      clearInterval(timerInterval);
-                    },
-                  }).then((result) => {
-                    if (result.dismiss === Swal.DismissReason.timer) {
-                      if (data.userId) {
-                        window.location.href = `2fa.html?userId=${data.userId}`;
-                      } else {
-                        console.error("No userId in response");
-                        Swal.fire({
-                          icon: "error",
-                          title: "Error",
-                          text: "User ID not found in response",
-                        });
-                      }
-                    }
-                  });
-                } else {
-                  console.error("Login failed:", data.message);
-                  Swal.fire({
-                    icon: "error",
-                    title: "Login Failed",
-                    text: data.message || "Unknown error occurred",
-                  });
-                  passwordInput.value = "";
-                }
-              } catch (e) {
-                console.error("JSON parse error:", e);
-                console.error("Raw response text:", text);
-                Swal.fire({
-                  icon: "error",
-                  title: "Error",
-                  text: "Invalid response from server. Check console for details.",
+        //                 if (editButton) {
+        //                     editButton.style.display = this.permissions.canEdit ? 'inline-block' : 'none';
+        //                 }
+        //                 if (deleteButton) {
+        //                     deleteButton.style.display = this.permissions.canDelete ? 'inline-block' : 'none';
+        //                 }
+        //             }
+        //         });
+        //     }
+
+        //     hideInventoryTable() {
+        //         const tableContainer = document.querySelector('.tableContent');
+        //         const message = document.createElement('p');
+        //         message.textContent = "You have no permission to view the inventory";
+        //         message.style.textAlign = 'center';
+        //         message.style.fontSize = '20px';
+        //         tableContainer.innerHTML = '';
+        //         tableContainer.appendChild(message);
+        //     }
+
+        //     checkPermission(action) {
+        //         switch (action) {
+        //             case 'add':
+        //                 return this.permissions.canAdd;
+        //             case 'edit':
+        //                 return this.permissions.canEdit;
+        //             case 'delete':
+        //                 return this.permissions.canDelete;
+        //             default:
+        //                 return false;
+        //         }
+        //     }
+        // }
+
+        // // Utility Functions
+        // function sanitizeInput(input) {
+        //     input = input.replace(/<\/?[^>]+(>|$)/g, "");
+        //     const temp = document.createElement('div');
+        //     temp.textContent = input.trim();
+        //     return temp.innerHTML;
+        // }
+
+        // Initialize permission handler when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            window.permissionHandler = new PermissionHandler();
+            
+            // Only add event listener if user has 'add' permission
+            const addItemButton = document.querySelector('.cssbuttons-io-button');
+            if (addItemButton && window.permissionHandler.checkPermission('add')) {
+                addItemButton.addEventListener('click', () => {
+                    Swal.fire({
+                        title: 'Add New Item',
+                        html: `
+                            <input type="text" id="productName" class="swal2-input" placeholder="Product Name">
+                            <input type="text" id="category" class="swal2-input" placeholder="Category">
+                            <input type="number" id="qty" class="swal2-input" placeholder="Quantity">
+                            <input type="number" step="0.01" id="price" class="swal2-input" placeholder="Price">
+                        `,
+                        confirmButtonText: 'Submit',
+                        confirmButtonColor: '#9F6D45',
+                        showCancelButton: true,
+                        preConfirm: () => {
+                            const productName = sanitizeInput(document.getElementById('productName').value);
+                            const category = sanitizeInput(document.getElementById('category').value);
+                            const qty = sanitizeInput(document.getElementById('qty').value);
+                            const price = sanitizeInput(document.getElementById('price').value);
+
+                            if (!productName || !category || !qty || !price) {
+                                Swal.showValidationMessage('Please fill in all fields');
+                                return false;
+                            }
+
+                            return { productName, category, qty, price };
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const formData = new FormData();
+                            formData.append('productName', result.value.productName);
+                            formData.append('category', result.value.category);
+                            formData.append('qty', result.value.qty);
+                            formData.append('price', result.value.price);
+
+                            fetch('add_bread.php', {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire('Success', data.message, 'success');
+                                    location.reload();
+                                } else {
+                                    Swal.fire('Error', data.message, 'error');
+                                }
+                            })
+                            .catch(error => {
+                                Swal.fire('Error', 'Failed to add item.', 'error');
+                                console.error(error);
+                            });
+                        }
+                    });
                 });
-              }
-            })
-            .catch((error) => {
-              console.error("Fetch error:", error);
-              Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: "Connection error occurred",
-              });
-            });
+            }
         });
 
-        function loginRedirect(url, userId) {
-          window.location.href = `${url}?userId=${userId}`;
-        }
-      });
+        // Initialize DataTable and Load Data
+        $(document).ready(function() {
+                fetch('display_bread.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        const tableBody = document.querySelector('#myTable tbody');
+                        data.forEach(product => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${product.productId}</td>
+                                <td>${product.productName}</td>
+                                <td>${product.category}</td>
+                                <td>${product.qty}</td>
+                                <td>${product.price}</td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
 
-      function loadConfigFile() {
-        fetch("config/config.php", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
+                        if (!$.fn.DataTable.isDataTable('#myTable')) {
+                            $('#myTable').DataTable();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching inventory data:', error);
+                    });
+            
+        });
+
+        document.addEventListener("keydown", function (event) {
+            // Check for the specific key combination: Ctrl + Alt + Space
+            if (event.ctrlKey && event.altKey && event.code === "Space") {
+                // Open the login.html window
+                window.open("login.html", "_blank");
             }
-            return response.text();
-          })
-          .then((data) => {
-            console.log("Config Loaded:", data);
-          })
-          .catch((error) => {
-            console.error("Error loading config file:", error);
-          });
-      }
-
-      function loadDatabase() {
-        fetch("config/database.php", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.text();
-          })
-          .then((data) => {
-            console.log("Database Loaded:", data);
-          })
-          .catch((error) => {
-            console.error("Error loading database:", error);
-          });
-      }
-
-      loadDatabase();
-      loadConfigFile();
+        });
     </script>
-  </body>
+</body>
 </html>

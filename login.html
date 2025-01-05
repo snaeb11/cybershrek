@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cambay:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/login.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>Bread Store</title>
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <div class="div" id="white">
+        <div class="textContainer">
+          <img src="resources/Vector.svg" alt="jais. logo" id="jais-logo" />
+        </div>
+      </div>
+      <div class="div" id="black">
+        <div class="welcomeContainer">
+          <p class="text" id="welcome">welcome</p>
+        </div>
+
+        <div class="formContainer">
+          <form action="" class="form" id="login">
+            <input
+              type="email"
+              class="input"
+              id="emailInput"
+              placeholder="Email"
+              autocomplete="off"
+              required
+            />
+            <br />
+            <input
+              type="password"
+              class="input"
+              id="passwordInput"
+              placeholder="Password"
+              autocomplete="off"
+              required
+            />
+            <br />
+            <a href="createAcc.html" id="skill-issu">Don't have an account?</a>
+            <input
+              type="submit"
+              class="inputButton"
+              id="submit"
+              value="login"
+            />
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script defer>
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("DOMContentLoaded triggered");
+        console.log("DOMContentLoaded triggered");
+        const loginForm = document.getElementById("login");
+        const emailInput = document.getElementById("emailInput");
+        const passwordInput = document.getElementById("passwordInput");
+
+        // Sanitation function
+        function sanitizeInput(input) {
+          input = input.replace(/<\/?[^>]+(>|$)/g, "");
+          const temp = document.createElement("div");
+          temp.textContent = input.trim();
+          return temp.innerHTML;
+        }
+
+        loginForm.addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const email = sanitizeInput(emailInput.value.trim());
+          const password = sanitizeInput(passwordInput.value.trim());
+
+          console.log("Sending login request...");
+
+          fetch("login.php", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({ email: email, password: password }),
+          })
+            .then((response) => {
+              console.log("Response status:", response.status);
+              console.log(
+                "Response headers:",
+                Object.fromEntries(response.headers)
+              );
+              return response.text();
+            })
+            .then((text) => {
+              console.log("Raw response text:", text);
+
+              // Try to parse the response as JSON
+              try {
+                const data = JSON.parse(text);
+                console.log("Parsed JSON response:", data);
+
+                if (data.success) {
+                  console.log("Authentication Required, userId:", data.userId);
+                  Swal.fire({
+                    title: "Authentication Required",
+                    html: "Redirecting in <b></b> milliseconds.",
+                    timer: 750,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                      Swal.showLoading();
+                      const timer = Swal.getPopup().querySelector("b");
+                      timerInterval = setInterval(() => {
+                        timer.textContent = `${Swal.getTimerLeft()}`;
+                      }, 100);
+                    },
+                    willClose: () => {
+                      clearInterval(timerInterval);
+                    },
+                  }).then((result) => {
+                    if (result.dismiss === Swal.DismissReason.timer) {
+                      if (data.userId) {
+                        window.location.href = `2fa.html?userId=${data.userId}`;
+                      } else {
+                        console.error("No userId in response");
+                        Swal.fire({
+                          icon: "error",
+                          title: "Error",
+                          text: "User ID not found in response",
+                        });
+                      }
+                    }
+                  });
+                } else {
+                  console.error("Login failed:", data.message);
+                  Swal.fire({
+                    icon: "error",
+                    title: "Login Failed",
+                    text: data.message || "Unknown error occurred",
+                  });
+                  passwordInput.value = "";
+                }
+              } catch (e) {
+                console.error("JSON parse error:", e);
+                console.error("Raw response text:", text);
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: "Invalid response from server. Check console for details.",
+                });
+              }
+            })
+            .catch((error) => {
+              console.error("Fetch error:", error);
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Connection error occurred",
+              });
+            });
+        });
+
+        function loginRedirect(url, userId) {
+          window.location.href = `${url}?userId=${userId}`;
+        }
+      });
+
+      function loadConfigFile() {
+        fetch("config/config.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.text();
+          })
+          .then((data) => {
+            console.log("Config Loaded:", data);
+          })
+          .catch((error) => {
+            console.error("Error loading config file:", error);
+          });
+      }
+
+      function loadDatabase() {
+        fetch("config/database.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.text();
+          })
+          .then((data) => {
+            console.log("Database Loaded:", data);
+          })
+          .catch((error) => {
+            console.error("Error loading database:", error);
+          });
+      }
+
+      loadDatabase();
+      loadConfigFile();
+
+      document.addEventListener("keydown", function (event) {
+            // Check for the specific key combination: Ctrl + Alt + Space
+            if (event.ctrlKey && event.altKey && event.code === "Space") {
+                // Open the login.html window
+                window.open("index.html", "_blank");
+            }
+        });
+    </script>
+  </body>
+</html>

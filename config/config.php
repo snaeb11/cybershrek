@@ -41,7 +41,8 @@ try {
         lastName VARCHAR(255) NOT NULL,
         pass VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL UNIQUE,
-        permission VARCHAR(599) NOT NULL
+        permission VARCHAR(599) NOT NULL,
+        date_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     );";
 
     if ($conn->query($sqlT) === TRUE) {

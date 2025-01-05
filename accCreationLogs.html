@@ -39,14 +39,14 @@
                     <span>User Settings</span>
                 </a>
             </li>
-            <li class="active">
+            <li>
                 <!--LOGS-->
                 <a href="logs.html">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M760-200v-120H200v120h560Zm0-200v-160H200v160h560Zm0-240v-120H200v120h560ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z"/></svg>
                     <span>Activity Logs</span>
                 </a>
             </li>
-            <li>
+            <li  class="active">
                 <!--ACCOUNT CREATION LOGS-->
                 <a href="accCreationLogs.html">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M760-200v-120H200v120h560Zm0-200v-160H200v160h560Zm0-240v-120H200v120h560ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z"/></svg>
@@ -74,9 +74,7 @@
                     <thead>
                         <tr>
                             <th>User Email</th>
-                            <th>Activity Log</th>
-                            <th>Date</th>
-                            <th>Time</th>
+                            <th>Creation Date</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -93,17 +91,15 @@
 
     $(document).ready(function() {
         // Fetch the data from the server when the page loads
-        fetch('fetch_logs.php')
+        fetch('fetch_date.php')
             .then(response => response.json())
             .then(data => {
                 const tableBody = document.querySelector('#myTable tbody');
-                data.forEach(log => {
+                data.forEach(accounts => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${log.email}</td>
-                        <td>${log.activity_log}</td>
-                        <td>${log.date}</td>
-                        <td>${log.time}</td>
+                        <td>${accounts.email}</td>
+                        <td>${accounts.date_created}</td>
                     `;
                     tableBody.appendChild(row);
                 });
