@@ -290,129 +290,170 @@
             const inventoryRow = document.getElementById('inventoryRow').querySelectorAll('input');
             const accountRow = document.getElementById('accountRow').querySelectorAll('input');
 
-            const permissions = {
-                inventory: {
-                    view: inventoryRow[0].checked,
-                    add: inventoryRow[1].checked,
-                    edit: inventoryRow[2].checked,
-                    delete: inventoryRow[3].checked,
-                },
-                account: {
-                    view: accountRow[0].checked,
-                    add: accountRow[1].checked,
-                    edit: accountRow[2].checked,
-                    delete: accountRow[3].checked,
-                },
-            };
+            // Collect permissions as an array
+            const permissions = [];
 
-            let newAccType = null;
+            // Inventory permissions
+            if (inventoryRow[0].checked) permissions.push('inventory:view');
+            if (inventoryRow[1].checked) permissions.push('inventory:add');
+            if (inventoryRow[2].checked) permissions.push('inventory:edit');
+            if (inventoryRow[3].checked) permissions.push('inventory:delete');
 
-            // Check for promotion conditions
-            if (permissions.inventory.add) {
+            // Account permissions
+            if (accountRow[0].checked) permissions.push('manage:view');
+            if (accountRow[2].checked) permissions.push('manage:edit');
+
+            // Determine account type based on permissions
+            let newAccType = 'Clerk'; // Default account type
+
+            if (permissions.includes('manage:view') ||
+                permissions.includes('manage:edit')) {
+                newAccType = 'Admin';
                 Swal.fire({
-                    title: "Promotion to Stockman",
-                    text: "You are giving 'add' permission to a clerk account, are you sure? This will promote them to Stockman.",
+                    title: "Promotion to Admin",
+                    text: "You are giving account management permissions. This will promote them to Admin.",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonText: "Yes, promote",
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        newAccType = "Stockman";
                         updatePermissions(userId, permissions, newAccType);
                     }
                 });
-            } else if (permissions.account.add) {
+            } else if ((permissions.includes('manage:view') ||
+                permissions.includes('manage:edit')) && (
+                permissions.includes('inventory:add') || 
+                permissions.includes('inventory:edit') || 
+                permissions.includes('inventory:delete'))) {
+                newAccType = 'Admin';
                 Swal.fire({
                     title: "Promotion to Admin",
-                    text: "You are giving 'add' permission to a clerk account, are you sure? This will promote them to Admin.",
+                    text: "You are giving account management permissions. This will promote them to Admin.",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonText: "Yes, promote",
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        newAccType = "Admin";
+                        updatePermissions(userId, permissions, newAccType);
+                    }
+                });
+            } else if (
+                permissions.includes('inventory:add') || 
+                permissions.includes('inventory:edit') || 
+                permissions.includes('inventory:delete')
+            ) {
+                newAccType = 'Stockman';
+                Swal.fire({
+                    title: "Promotion to Stockman",
+                    text: "You are giving inventory management permissions. This will promote them to Stockman.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, promote",
+                }).then((result) => {
+                    if (result.isConfirmed) {
                         updatePermissions(userId, permissions, newAccType);
                     }
                 });
             } else {
-                // Save permissions without promotion
-                updatePermissions(userId, permissions);
+                updatePermissions(userId, permissions, newAccType);
             }
         }
 
-        function updatePermissions(userId, permissions, accType = null) {
-            fetch("save_user_permissions.php", {
+        function updatePermissions(userId, permissions, newAccType) {
+            console.log("works here upd");
+
+            const payload = {
+                userId: userId,
+                permissions: permissions,  // Send the array directly
+                accType: newAccType
+            };
+
+            console.log('Sending payload:', payload);
+
+            fetch("update_permission.php", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ userId, permissions, accType }),
+                body: JSON.stringify(payload),
+                credentials: 'include'  // Include session cookies
             })
-                .then((response) => response.json())
-                .then((result) => {
-                    if (result.success) {
-                        Swal.fire("Saved!", "User permissions updated successfully.", "success");
-                        document.getElementById("popup").style.display = "none";
-                        location.reload();
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        console.error('Error response:', text);
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(result => {
+                console.log('Success result:', result);
+                    if (result.status === 'success') {
+                        Swal.fire("Saved!", result.message, "success")
+                        .then(() => {
+                            document.getElementById("popup").style.display = "none";
+                            location.reload();
+                        });
                     } else {
-                        Swal.fire("Error", "Failed to update permissions.", "error");
+                        // In case the response doesn't indicate success, treat it as an error
+                        throw new Error(result.message || "Failed to update permissions.");
                     }
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                    Swal.fire("Error", "An unexpected error occurred.", "error");
-                });
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                Swal.fire("Error", error.message || "An unexpected error occurred.", "error");
+            });
         }
-
-
 
 
         function logout() {
-    Swal.fire({
-        title: 'Logout',
-        text: 'Are you sure you want to logout?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#9F6D45',
-        confirmButtonText: 'Logout',
-        cancelButtonText: 'Cancel'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch('logout.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        title: 'Logged Out!',
-                        text: 'You have been successfully logged out',
-                        icon: 'success',
-                        timer: 1500,
-                        timerProgressBar: true,
-                        showConfirmButton: false
-                    }).then(() => {
-                        window.location.href = 'login.html';
+            Swal.fire({
+                title: 'Logout',
+                text: 'Are you sure you want to logout?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#9F6D45',
+                confirmButtonText: 'Logout',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('logout.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Logged Out!',
+                                text: 'You have been successfully logged out',
+                                icon: 'success',
+                                timer: 1500,
+                                timerProgressBar: true,
+                                showConfirmButton: false
+                            }).then(() => {
+                                window.location.href = 'login.html';
+                            });
+                        } else {
+                            throw new Error(data.message || 'Logout failed');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Logout error:', error);
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'An error occurred during logout',
+                            icon: 'error'
+                        });
                     });
-                } else {
-                    throw new Error(data.message || 'Logout failed');
                 }
-            })
-            .catch(error => {
-                console.error('Logout error:', error);
-                Swal.fire({
-                    title: 'Error',
-                    text: 'An error occurred during logout',
-                    icon: 'error'
-                });
             });
         }
-    });
-}
     </script>
 </body>
 </html>
