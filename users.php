@@ -183,7 +183,6 @@
                 if (!this.permissions.canManageView) {
                     this.showNoPermissionsMessage();
                 } else {
-                    this.loadAccountsTable();
                 }
             }
 
