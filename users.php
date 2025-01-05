@@ -113,6 +113,7 @@
                     <thead>
                         <tr>
                             <th>Account Name</th>
+                            <th>Account Type</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -125,6 +126,7 @@
             <div class="popup-content">
                 <h2>Modify User</h2>
                 <h3 id="userInfo">Name: </h3>
+                <h3 id="userType">Account Type: </h3>
                 <table class="popup-table">
                     <thead>
                         <tr>
@@ -221,6 +223,7 @@
                         
                         row.innerHTML = `
                             <td>${account.firstName} ${account.lastName}</td>
+                            <td>${account.accType}</td>
                             <td>${actionButton}</td>
                         `;
                         tableBody.appendChild(row);
@@ -246,6 +249,7 @@
                 .then((response) => response.json())
                 .then((data) => {
                     userInfo.innerText = `Name: ${data.firstName} ${data.lastName}`;
+                    userType.innerText = `Account Type: ${data.accType}`;
 
                     const permissionList = data.permissions.split(',').map((perm) => perm.trim());
 
@@ -283,68 +287,83 @@
 
         function save() {
             const userId = document.getElementById('popup').getAttribute('data-user-id');
-
-            const permissions = [];
-
             const inventoryRow = document.getElementById('inventoryRow').querySelectorAll('input');
             const accountRow = document.getElementById('accountRow').querySelectorAll('input');
 
-            if (inventoryRow[0].checked) permissions.push('inventory:view');
-            if (inventoryRow[1].checked) permissions.push('inventory:add');
-            if (inventoryRow[2].checked) permissions.push('inventory:edit');
-            if (inventoryRow[3].checked) permissions.push('inventory:delete');
+            const permissions = {
+                inventory: {
+                    view: inventoryRow[0].checked,
+                    add: inventoryRow[1].checked,
+                    edit: inventoryRow[2].checked,
+                    delete: inventoryRow[3].checked,
+                },
+                account: {
+                    view: accountRow[0].checked,
+                    add: accountRow[1].checked,
+                    edit: accountRow[2].checked,
+                    delete: accountRow[3].checked,
+                },
+            };
 
-            if (accountRow[0].checked) permissions.push('manage:view');
-            if (accountRow[1].checked) permissions.push('manage:add');
-            if (accountRow[2].checked) permissions.push('manage:edit');
-            if (accountRow[3].checked) permissions.push('manage:delete');
+            let newAccType = null;
 
-            console.log('Permissions:', permissions);
-
-            Swal.fire({
-                title: 'Confirm Save',
-                text: `Are you sure you want to save these changes?\nPermissions: ${permissions.join(', ')}\nFor: ${userInfo.innerText.replace('Name: ', '')}`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#9F6D45',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, Save',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    console.log("works here");
-                    fetch('save_user_permissions.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ userId, permissions })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("Save response:", data);
-                
-                        if (data.status === 'success') {
-                            console.log("Saved Permissions:", permissions);
-                            console.log("Saved for UserId:", userId);
-                            
-                            Swal.fire('Saved!', data.message, 'success');
-                            popup.style.display = 'none';
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: data.message || 'An unexpected error occurred.'
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error saving permissions:', error);
-                        Swal.fire('Error!', 'An error occurred while saving permissions.', 'error');
-                    });
-                }
-            });
+            // Check for promotion conditions
+            if (permissions.inventory.add) {
+                Swal.fire({
+                    title: "Promotion to Stockman",
+                    text: "You are giving 'add' permission to a clerk account, are you sure? This will promote them to Stockman.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, promote",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        newAccType = "Stockman";
+                        updatePermissions(userId, permissions, newAccType);
+                    }
+                });
+            } else if (permissions.account.add) {
+                Swal.fire({
+                    title: "Promotion to Admin",
+                    text: "You are giving 'add' permission to a clerk account, are you sure? This will promote them to Admin.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, promote",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        newAccType = "Admin";
+                        updatePermissions(userId, permissions, newAccType);
+                    }
+                });
+            } else {
+                // Save permissions without promotion
+                updatePermissions(userId, permissions);
+            }
         }
+
+        function updatePermissions(userId, permissions, accType = null) {
+            fetch("save_user_permissions.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ userId, permissions, accType }),
+            })
+                .then((response) => response.json())
+                .then((result) => {
+                    if (result.success) {
+                        Swal.fire("Saved!", "User permissions updated successfully.", "success");
+                        document.getElementById("popup").style.display = "none";
+                        location.reload();
+                    } else {
+                        Swal.fire("Error", "Failed to update permissions.", "error");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    Swal.fire("Error", "An unexpected error occurred.", "error");
+                });
+        }
+
 
 
 

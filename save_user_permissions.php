@@ -12,14 +12,20 @@
 
     if (isset($input['userId'], $input['permissions'])) {
         $userId = $input['userId'];
+        $accType = $data['accType'];
         $permissions = implode(', ', $input['permissions']);
+
+        if (empty($accType)) {
+            echo json_encode(['success' => false, 'message' => 'Account type cannot be null.']);
+            exit;
+        }
 
         if ($userId == 1) {
             echo json_encode(['status' => 'error', 'message' => 'This user cannot be edited.']);
             exit;
         }
 
-        $query = "UPDATE accounts SET permission = ? WHERE userId = ?";
+        $query = "UPDATE accounts SET permission = ?, accType = ? WHERE userId = ?";
         $stmt = $conn->prepare($query);
         $stmt->bind_param("si", $permissions, $userId);
 
