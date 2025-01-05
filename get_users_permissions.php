@@ -9,7 +9,7 @@ header('Content-Type: application/json');
 
 $userId = $_GET['userId'];
 
-$query = "SELECT firstName, lastName, permission FROM accounts WHERE userId = ?";
+$query = "SELECT firstName, lastName, accType, permission FROM accounts WHERE userId = ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $userId);
 $stmt->execute();
@@ -20,6 +20,7 @@ if ($data) {
     echo json_encode([
         'firstName' => $data['firstName'],
         'lastName' => $data['lastName'],
+        'accType' => $data['accType'],
         'permissions' => $data['permission']
     ]);
 } else {

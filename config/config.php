@@ -41,6 +41,7 @@ try {
         lastName VARCHAR(255) NOT NULL,
         pass VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL UNIQUE,
+        accType VARCHAR(255) NOT NULL,
         permission VARCHAR(599) NOT NULL,
         date_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     );";
@@ -57,8 +58,8 @@ try {
 // Insert Default Admin Account
 try {
     $adminPass = encryptPassword("admin123", $key); // Encrypt the password using Dcrypt
-    $sqlInsertAdmin = "INSERT IGNORE INTO accounts (firstName, lastName, pass, email, permission) VALUES 
-                       ('Admin', 'Admin', ?, 'admin@gmail.com', 'inventory:view, inventory:add, inventory:edit, inventory:delete, manage:view, manage:edit');";
+    $sqlInsertAdmin = "INSERT IGNORE INTO accounts (firstName, lastName, pass, email, accType, permission) VALUES 
+                       ('Admin', 'Admin', ?, 'admin@gmail.com', 'Super Admin', 'inventory:view, inventory:add, inventory:edit, inventory:delete, manage:view, manage:edit');";
 
     $stmt = $conn->prepare($sqlInsertAdmin);
     $stmt->bind_param("s", $adminPass);
