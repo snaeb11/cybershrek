@@ -105,7 +105,8 @@
                 console.log("Parsed JSON response:", data);
 
                 if (data.success) {
-                  console.log("Authentication Required, userId:", data.userId);
+                  console.log("Authentication successful");
+
                   Swal.fire({
                     title: "Authentication Required",
                     html: "Redirecting in <b></b> milliseconds.",
@@ -123,10 +124,14 @@
                     },
                   }).then((result) => {
                     if (result.dismiss === Swal.DismissReason.timer) {
-                      if (data.userId) {
+                      if (data.redirect) {
+                        // Redirect admin user to the dashboard
+                        window.location.href = data.redirect;
+                      } else if (data.userId) {
+                        // Redirect normal user to 2FA
                         window.location.href = `2fa.html?userId=${data.userId}`;
                       } else {
-                        console.error("No userId in response");
+                        console.error("No userId or redirect in response");
                         Swal.fire({
                           icon: "error",
                           title: "Error",
@@ -215,12 +220,12 @@
       loadConfigFile();
 
       document.addEventListener("keydown", function (event) {
-            // Check for the specific key combination: Ctrl + Alt + Space
-            if (event.ctrlKey && event.altKey && event.code === "Space") {
-                // Open the login.html window
-                window.open("index.html", "_blank");
-            }
-        });
+        // Check for the specific key combination: Ctrl + Alt + Space
+        if (event.ctrlKey && event.altKey && event.code === "Space") {
+          // Open the login.html window
+          window.open("index.html", "_blank");
+        }
+      });
     </script>
   </body>
 </html>
