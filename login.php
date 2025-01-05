@@ -86,6 +86,7 @@ function authenticateUser($email, $password) {
                 'userId' => 1, 
                 'redirect' => 'inventory.php'
             ]);
+            insertUserActivityLog($_SESSION['user_email'], "Admin login");
             exit();
         }
 
