@@ -52,15 +52,16 @@ $firstName = sanitizeInput($input['firstName'] ?? '');
 $lastName = sanitizeInput($input['lastName'] ?? '');
 $pass = sanitizeInput($input['pass'] ?? '');
 $email = sanitizeInput($input['email'] ?? '');
+$accType = "Clerk";
 $permission = "inventory:view"; 
 
 // Encrypt the password
 $passwordHash = encryptPassword($pass);
 
 // Insert the new account into the database
-$query = "INSERT INTO accounts (firstName, lastName, pass, email, permission) VALUES (?, ?, ?, ?, ?)";
+$query = "INSERT INTO accounts (firstName, lastName, pass, email, accType, permission) VALUES (?, ?, ?, ?, ?, ?)";
 $stmt = $conn->prepare($query);
-$stmt->bind_param("sssss", $firstName, $lastName, $passwordHash, $email, $permission);
+$stmt->bind_param("ssssss", $firstName, $lastName, $passwordHash, $email, $accType, $permission);
 
 if ($stmt->execute()) {
     echo json_encode(['success' => true, 'message' => 'Account created successfully.']);

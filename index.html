@@ -124,7 +124,7 @@
                   }).then((result) => {
                     if (result.dismiss === Swal.DismissReason.timer) {
                       if (data.userId) {
-                        window.location.href = `2fa.html?userId=${data.userId}`;
+                        window.location.href = `2fa.html`;
                       } else {
                         console.error("No userId in response");
                         Swal.fire({
@@ -165,7 +165,7 @@
         });
 
         function loginRedirect(url, userId) {
-          window.location.href = `${url}?userId=${userId}`;
+          window.location.href = `${url}`;
         }
       });
 
