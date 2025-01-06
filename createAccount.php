@@ -32,10 +32,10 @@ function sanitizeInput($input) {
 }
 
 // Define a function to securely encrypt data using Dcrypt
-function encryptPassword($password) {
+function encryptData($data) {
     global $key;
-    $encryptedData = \Dcrypt\Aes::encrypt($password, $key);
-    return base64_encode($encryptedData);
+    $encryptedData = \Dcrypt\Aes::encrypt($data, $key);
+    return base64_encode($encryptedData); // Base64 encode for storage
 }
 
 // Handle JSON input
@@ -55,13 +55,16 @@ $email = sanitizeInput($input['email'] ?? '');
 $accType = "Clerk";
 $permission = "inventory:view"; 
 
-// Encrypt the password
-$passwordHash = encryptPassword($pass);
+// Encrypt sensitive data
+$encryptedFirstName = encryptData($firstName);
+$encryptedLastName = encryptData($lastName);
+$encryptedEmail = encryptData($email);
+$passwordHash = encryptData($pass);
 
 // Insert the new account into the database
 $query = "INSERT INTO accounts (firstName, lastName, pass, email, accType, permission) VALUES (?, ?, ?, ?, ?, ?)";
 $stmt = $conn->prepare($query);
-$stmt->bind_param("ssssss", $firstName, $lastName, $passwordHash, $email, $accType, $permission);
+$stmt->bind_param("ssssss", $encryptedFirstName, $encryptedLastName, $passwordHash, $encryptedEmail, $accType, $permission);
 
 if ($stmt->execute()) {
     echo json_encode(['success' => true, 'message' => 'Account created successfully.']);
@@ -73,3 +76,4 @@ if ($stmt->execute()) {
 // Close the statement and connection
 $stmt->close();
 $conn->close();
+?>

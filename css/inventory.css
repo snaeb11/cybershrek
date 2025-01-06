@@ -145,6 +145,23 @@ svg{
     font-weight: 1000;
     color: #9F6D45;
     padding-left: 1%;
+    margin-bottom: 0;
+}
+
+#subTitle{
+    margin-top: 0;
+    font-size: 25px;
+    font-weight: 1000;
+    color: #473220;
+    padding-left: 1%;
+}
+
+#accTypeTitle{
+    margin-top: 0;
+    font-size: 20px;
+    font-weight: 1000;
+    color: #473220;
+    padding-left: 1%;
 }
 
 .tableContent {

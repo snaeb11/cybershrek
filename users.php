@@ -1,6 +1,7 @@
 <?php
     session_start();
     require_once 'config/db_connection.php';
+    require_once __DIR__ . '/vendor/autoload.php';
 
     function fetchUserPermissions($userId) {
         global $conn;
@@ -17,6 +18,39 @@
         
         return []; 
     }
+
+    //--------------------------------------
+    $envFile = '.env';
+    $envVariables = [];
+    if (file_exists($envFile)) {
+        $envContents = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($envContents as $line) {
+            if (strpos($line, '=') !== false) {
+                list($key, $value) = explode('=', $line, 2);
+                $envVariables[$key] = trim($value);
+            }
+        }
+    }
+
+    $key = $envVariables['ENCRYPTION_KEY'] ?? null;
+
+    // Ensure the encryption key is set
+    if (!$key) {
+        echo json_encode(['success' => false, 'message' => 'Encryption key is not set in the .env file.']);
+        exit;
+    }
+
+    function decryptPassword($encryptedPassword) {
+        global $key;
+        try {
+            $decodedPassword = base64_decode($encryptedPassword);
+            return \Dcrypt\Aes::decrypt($decodedPassword, $key);
+        } catch (Exception $e) {
+            debug_log("Decryption error", ['error' => $e->getMessage()]);
+            return false;
+        }
+    }
+    //--------------------------------------
 
     // Check if the user is logged in
     if (isset($_SESSION['user']['userId'])) {

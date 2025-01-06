@@ -1,30 +1,36 @@
 <?php
-    session_start();
-    require_once 'config/db_connection.php';
+session_start();
+require_once 'config/db_connection.php';
 
-    function fetchUserPermissions($userId) {
-        global $conn;
-        
-        $stmt = $conn->prepare("SELECT permission FROM accounts WHERE userId = ?");
-        $stmt->bind_param("i", $userId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        if ($result->num_rows > 0) {
-            $user = $result->fetch_assoc();
-            return explode(', ', $user['permission']); 
-        }
-        
-        return []; 
+function fetchUserPermissions($userId) {
+    global $conn;
+
+    $stmt = $conn->prepare("SELECT firstName, accType, permission FROM accounts WHERE userId = ?");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        return $result->fetch_assoc(); // Returns an associative array with user details
     }
 
-    // Check if the user is logged in
-    if (isset($_SESSION['user']['userId'])) {
+    return null;
+}
 
-        $userId = $_SESSION['user']['userId'];
-        
-        $permissions = fetchUserPermissions($userId);
-        
+// Check if the user is logged in
+if (isset($_SESSION['user']['userId'])) {
+    $userId = $_SESSION['user']['userId'];
+
+    // Fetch user details
+    $userDetails = fetchUserPermissions($userId);
+
+    if ($userDetails) {
+        // Extract the required details from the associative array
+        $firstName = $userDetails['firstName'];
+        $accType = $userDetails['accType'];
+        $permissions = explode(', ', $userDetails['permission']);
+
+        // Define permissions
         $canViewInventory = in_array('inventory:view', $permissions);
         $canAddInventory = in_array('inventory:add', $permissions);
         $canEditInventory = in_array('inventory:edit', $permissions);
@@ -41,14 +47,19 @@
             var canManageView = " . ($canManageView ? 'true' : 'false') . ";
             var canManageEdit = " . ($canManageEdit ? 'true' : 'false') . ";
             console.log('User ID:', userId);
-            console.log('Permissions:', { canViewInventory, canAddInventory , canEditInventory, canDeleteInventory, canManageView, canManageEdit});
+            console.log('Permissions:', { canViewInventory, canAddInventory , canEditInventory, canDeleteInventory, canManageView, canManageEdit });
+
         </script>";
     } else {
-        
         echo "<script>
-            console.log('User is not logged in');
+            console.log('Failed to fetch user details');
         </script>";
     }
+} else {
+    echo "<script>
+        console.log('User is not logged in');
+    </script>";
+}
 ?>
 
 <!DOCTYPE html>

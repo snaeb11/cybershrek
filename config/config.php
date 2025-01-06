@@ -55,24 +55,43 @@ try {
     echo "Error: " . $e->getMessage() . "<br>";
 }
 
-// Insert Default Admin Account
+// Insert Default Admin Account if not exists
 try {
-    $adminPass = encryptPassword("admin123", $key); // Encrypt the password using Dcrypt
-    $sqlInsertAdmin = "INSERT IGNORE INTO accounts (firstName, lastName, pass, email, accType, permission) VALUES 
-                       ('Admin', 'Admin', ?, 'admin@gmail.com', 'Super Admin', 'inventory:view, inventory:add, inventory:edit, inventory:delete, manage:view, manage:edit');";
+    // Check if an admin already exists
+    $sqlCheckAdmin = "SELECT COUNT(*) FROM accounts WHERE accType = 'Super Admin'";
+    $result = $conn->query($sqlCheckAdmin);
 
-    $stmt = $conn->prepare($sqlInsertAdmin);
-    $stmt->bind_param("s", $adminPass);
+    if ($result) {
+        $row = $result->fetch_row();
+        if ($row[0] > 0) {
+            echo "Admin account already exists. No need to insert.<br>";
+        } else {
+            // Proceed to insert default admin account
+            $adminPass = encryptPassword("admin123", $key); // Encrypt the password using Dcrypt
+            $adminFirstName = encryptPassword("Vincent Kyle", $key);
+            $adminLastName = encryptPassword("Arsenio", $key);
+            $adminEmail = encryptPassword("vkoarsenio02205@usep.edu.ph", $key);
 
-    if ($stmt->execute()) {
-        echo "Default Admin account inserted successfully.<br>";
+            $sqlInsertAdmin = "INSERT INTO accounts (firstName, lastName, pass, email, accType, permission) VALUES 
+                               (?, ?, ?, ?, 'Super Admin', 'inventory:view, inventory:add, inventory:edit, inventory:delete, manage:view, manage:edit');";
+            
+            $stmt = $conn->prepare($sqlInsertAdmin);
+            $stmt->bind_param("ssss", $adminFirstName, $adminLastName, $adminPass, $adminEmail);
+
+            if ($stmt->execute()) {
+                echo "Default Admin account inserted successfully.<br>";
+            } else {
+                echo "Error inserting Admin account: " . $stmt->error . "<br>";
+            }
+            $stmt->close();
+        }
     } else {
-        echo "Error inserting Admin account: " . $stmt->error . "<br>";
+        echo "Error checking existing admin account: " . $conn->error . "<br>";
     }
-    $stmt->close();
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage() . "<br>";
 }
+
 
 // Insert Bread Table
 try {
