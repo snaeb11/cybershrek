@@ -200,6 +200,7 @@
             hideRestrictedMenuItems() {
                 const userSettingsMenu = document.querySelector('li a[href="users.php"]');
                 const logsMenu = document.querySelector('li a[href="logs.html"]');
+                const accLogs = document.querySelector('li a[href="accCreationLogs.html"]');
                 
                 // Hide "User Settings" if the user does not have manage:view or manage:edit permission
                 if (userSettingsMenu && !(this.permissions.canManageEdit || this.permissions.canManageView)) {
@@ -207,8 +208,9 @@
                 }
                 
                 // Hide "Logs" if the user does not have manage:admin permission
-                if (logsMenu && !this.permissions.canManageView) {
+                if ((logsMenu && accLogs) && !this.permissions.canManageView) {
                     logsMenu.parentElement.style.display = 'none';
+                    accLogs.parentElement.style.display = 'none';
                 }
             }
 
